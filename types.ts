@@ -3,10 +3,19 @@ export interface AuditSection {
   comment: string;
 }
 
+export interface SocialMediaStat {
+  platform: string;
+  followers: string;
+}
+
+export interface DigitalMarketingSection extends AuditSection {
+  socialMediaStats: SocialMediaStat[];
+}
+
 export interface AuditReportData {
   websiteUx?: AuditSection;
   seo?: AuditSection;
-  digitalMarketingPresence?: AuditSection;
+  digitalMarketingPresence?: DigitalMarketingSection;
   contentCommunication?: AuditSection;
   aiAutomation?: AuditSection;
   overallPotential?: AuditSection;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AuditReportData, AuditSection } from '../types';
+import type { AuditReportData, AuditSection, DigitalMarketingSection } from '../types';
 import { ReportSection } from './ReportSection';
 import { ScoreDonutChart } from './ScoreDonutChart';
 import { DownloadIcon, WebsiteIcon, SeoIcon, MarketingIcon, ContentIcon, PotentialIcon, AiIcon } from './Icons';
@@ -58,17 +58,24 @@ export const Report: React.FC<ReportProps> = ({ data, url, onPrint }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        {reportSections.map((section, index) => (
-          section.data ? (
+        {reportSections.map((section, index) => {
+          if (!section.data) return null;
+
+          const socialStats = section.title === 'Digital Marketing' && section.data
+            ? (section.data as DigitalMarketingSection).socialMediaStats
+            : undefined;
+
+          return (
             <ReportSection
               key={index}
               title={section.title}
               score={section.data.score}
               comment={section.data.comment}
               icon={section.icon}
+              socialMediaStats={socialStats}
             />
-          ) : null
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -112,12 +112,13 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
 
     6.  **Annoncering & Optimering (Advertising & Optimization):**
         - This section should NOT have a score.
-        - Scan for evidence of Google Ads (e.g., gclid parameters, conversion tracking) and Meta Ads (Facebook Pixel).
-        - To provide context, research and include relevant industry benchmarks (e.g., average Click-Through Rate (CTR) or Conversion Rate for their sector in Denmark). Briefly compare the client's likely performance against these benchmarks.
-        - If evidence is found, provide a concise summary of their current advertising strategy and its likely performance.
-        - If no evidence is found, state that this is a major untapped opportunity, referencing the industry benchmarks to show what they're missing.
-        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their results. These should be specific (e.g., "* Lancér en Google Search-kampagne målrettet søgeord som 'VVS i [By]' for at fange kunder med høj købsintention." instead of just "Improve ads").
-        - Frame this as a major growth opportunity.
+        - Scan for evidence of Google Ads (e.g., gclid parameters) and Meta Ads (Facebook Pixel).
+        - CRITICAL: To provide context, you MUST research and include relevant industry benchmarks for a similar business in Denmark (e.g., average Click-Through Rate (CTR) or Conversion Rate for their specific sector). This context is vital.
+        - Based on your findings:
+          - If ad evidence is found, provide a concise summary of their current advertising strategy and compare their likely performance against the industry benchmarks you found.
+          - If no ad evidence is found, state that this is a major untapped opportunity, using the industry benchmarks to quantify what they are missing out on.
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their results. These should be specific and data-driven.
+        - Frame this entire section as a major growth opportunity.
 
     Finally, provide an "Overall Potential" score (0-100) indicating how likely this prospect is a good fit for Outsource.dk.
     Also, write a 2-3 sentence executive summary of the most critical findings.
@@ -143,7 +144,6 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
   }
 };
 
-// FIX: Added a schema to get a structured JSON response with multiple pitch variations.
 const pitchSchema = {
   type: Type.OBJECT,
   properties: {
@@ -159,7 +159,6 @@ const pitchSchema = {
   required: ['pitches']
 };
 
-// FIX: Updated function to generate and return an array of sales pitches.
 export const generateSalesPitch = async (reportData: AuditReportData): Promise<string[]> => {
   const prompt = `
     Based on the following digital marketing audit report for a potential client, generate an array of 3 compelling and concise 30-second sales pitch variations in Danish.

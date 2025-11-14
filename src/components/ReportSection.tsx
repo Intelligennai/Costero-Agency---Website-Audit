@@ -1,13 +1,13 @@
-
 import React from 'react';
 import type { SocialMediaStat } from '../types';
-import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon } from './Icons';
+import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon, YouTubeIcon, PinterestIcon, RedditIcon } from './Icons';
 
 interface ReportSectionProps {
   title: string;
-  score: number;
+  score?: number;
   comment: string;
   icon: React.ReactNode;
+  className?: string;
   socialMediaStats?: SocialMediaStat[];
 }
 
@@ -24,23 +24,28 @@ const SocialIcon: React.FC<{ platform: string; className?: string }> = ({ platfo
     if (lowerPlatform.includes('tiktok')) return <TiktokIcon {...props} />;
     if (lowerPlatform.includes('x') || lowerPlatform.includes('twitter')) return <TwitterIcon {...props} />;
     if (lowerPlatform.includes('linkedin')) return <LinkedInIcon {...props} />;
+    if (lowerPlatform.includes('youtube')) return <YouTubeIcon {...props} />;
+    if (lowerPlatform.includes('pinterest')) return <PinterestIcon {...props} />;
+    if (lowerPlatform.includes('reddit')) return <RedditIcon {...props} />;
     return null;
 };
 
-export const ReportSection: React.FC<ReportSectionProps> = ({ title, score, comment, icon, socialMediaStats }) => {
-  const scoreColor = getScoreColor(score);
+const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats }) => {
+  const scoreColor = score !== undefined ? getScoreColor(score) : '';
 
   return (
-    <div className="bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid">
+    <div className={`bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <span className="text-brand-cyan">{icon}</span>
+          <span className="text-brand-cyan" title={title}>{icon}</span>
           <h4 className="text-xl font-bold text-brand-light">{title}</h4>
         </div>
-        <div className={`text-3xl font-bold ${scoreColor}`}>{score}<span className="text-lg">/100</span></div>
+        {score !== undefined && (
+          <div className={`text-3xl font-bold ${scoreColor}`}>{score}<span className="text-lg">/100</span></div>
+        )}
       </div>
-      <p className="text-brand-text flex-grow">{comment}</p>
-
+      <p className="text-brand-text flex-grow whitespace-pre-wrap">{comment}</p>
+      
       {socialMediaStats && socialMediaStats.length > 0 && (
         <div className="mt-4 pt-4 border-t border-brand-accent/30">
           <h5 className="text-sm font-bold text-brand-light mb-2">Social Media Følgere</h5>
@@ -51,7 +56,7 @@ export const ReportSection: React.FC<ReportSectionProps> = ({ title, score, comm
                   <SocialIcon platform={stat.platform} className="w-5 h-5 text-brand-light" />
                   {stat.platform}
                 </span>
-                <span className="font-semibold">{stat.followers}</span>
+                <span className="font-semibold text-brand-cyan">{stat.followers}</span>
               </li>
             ))}
           </ul>
@@ -60,3 +65,5 @@ export const ReportSection: React.FC<ReportSectionProps> = ({ title, score, comm
     </div>
   );
 };
+
+export const ReportSection = React.memo(ReportSectionComponent);
