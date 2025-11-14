@@ -1,8 +1,5 @@
-/// <reference types="vite/client" />
-
-// FIX: Manually define ImportMetaEnv to resolve TypeScript errors
-// related to `import.meta.env` when the `vite/client` types are not
-// automatically discovered.
+// FIX: Removed `/// <reference types="vite/client" />` as it was causing a "Cannot find type definition" error.
+// The manual definitions below are used instead to provide types for `import.meta.env`.
 interface ImportMetaEnv {
   readonly VITE_API_KEY: string;
 }
