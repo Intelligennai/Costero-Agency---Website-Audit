@@ -1,12 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { AuditReportData } from '../types';
 
-// FIX: Switched from import.meta.env.VITE_API_KEY to process.env.API_KEY to align with guidelines and fix TypeScript error.
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set");
+// FIX: Switched to Vite's method for accessing environment variables. This is crucial for frontend deployment.
+if (!import.meta.env.VITE_API_KEY) {
+  throw new Error("VITE_API_KEY environment variable not set");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
 
 const auditSectionSchema = {
   type: Type.OBJECT,
