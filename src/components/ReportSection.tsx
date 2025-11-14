@@ -1,6 +1,6 @@
 import React from 'react';
-import type { SocialMediaStat } from '../types';
-import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon, YouTubeIcon, PinterestIcon, RedditIcon } from './Icons';
+import type { SocialMediaStat, ReviewStats } from '../types';
+import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon, YouTubeIcon, PinterestIcon, RedditIcon, TrustpilotIcon, GoogleIcon } from './Icons';
 
 interface ReportSectionProps {
   title: string;
@@ -9,6 +9,8 @@ interface ReportSectionProps {
   icon: React.ReactNode;
   className?: string;
   socialMediaStats?: SocialMediaStat[];
+  trustpilot?: ReviewStats;
+  googleReviews?: ReviewStats;
 }
 
 const getScoreColor = (score: number) => {
@@ -30,8 +32,9 @@ const SocialIcon: React.FC<{ platform: string; className?: string }> = ({ platfo
     return null;
 };
 
-const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats }) => {
+const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats, trustpilot, googleReviews }) => {
   const scoreColor = score !== undefined ? getScoreColor(score) : '';
+  const hasReputationData = trustpilot || googleReviews;
 
   return (
     <div className={`bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
@@ -60,6 +63,38 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {hasReputationData && (
+        <div className="mt-4 pt-4 border-t border-brand-accent/30">
+            <h5 className="text-sm font-bold text-brand-light mb-2">Online Omdømme</h5>
+            <ul className="space-y-2">
+                {googleReviews && (
+                    <li className="flex items-center justify-between text-brand-text">
+                        <span className="flex items-center gap-2">
+                            <GoogleIcon className="w-5 h-5 text-brand-light" />
+                            Google Reviews
+                        </span>
+                        <div className="text-right">
+                            <p className="font-semibold text-brand-yellow">{googleReviews.score}</p>
+                            <p className="text-xs text-brand-light">{googleReviews.reviewCount}</p>
+                        </div>
+                    </li>
+                )}
+                {trustpilot && (
+                    <li className="flex items-center justify-between text-brand-text">
+                        <span className="flex items-center gap-2">
+                            <TrustpilotIcon className="w-5 h-5 text-brand-green" />
+                            Trustpilot
+                        </span>
+                         <div className="text-right">
+                            <p className="font-semibold text-brand-yellow">{trustpilot.score}</p>
+                            <p className="text-xs text-brand-light">{trustpilot.reviewCount}</p>
+                        </div>
+                    </li>
+                )}
+            </ul>
         </div>
       )}
     </div>

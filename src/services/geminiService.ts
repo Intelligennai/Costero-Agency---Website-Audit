@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { AuditReportData } from '../types';
 
@@ -44,6 +43,24 @@ const auditSchema = {
             },
             required: ['platform', 'followers']
           }
+        },
+        trustpilot: {
+          type: Type.OBJECT,
+          description: "Trustpilot review statistics. Omit if not found.",
+          properties: {
+            score: { type: Type.STRING, description: "Overall score, e.g., '4.5/5'." },
+            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '1,234 anmeldelser'." }
+          },
+          required: ['score', 'reviewCount']
+        },
+        googleReviews: {
+          type: Type.OBJECT,
+          description: "Google Reviews statistics from their Business Profile. Omit if not found.",
+          properties: {
+            score: { type: Type.STRING, description: "Overall score, e.g., '4.8/5'." },
+            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '512 anmeldelser'." }
+          },
+          required: ['score', 'reviewCount']
         }
       },
       required: ['score', 'comment', 'socialMediaStats']
@@ -68,6 +85,14 @@ const auditSchema = {
       required: ['comment'],
       description: "Analysis of current advertising efforts and suggestions for improvement."
     },
+    googleMyBusiness: {
+      type: Type.OBJECT,
+      properties: {
+        comment: { type: Type.STRING, description: "Detailed analysis of the Google My Business profile with 3-4 specific, actionable recommendations as bullet points." }
+      },
+      required: ['comment'],
+      description: "Analysis of the company's Google My Business profile and local SEO potential."
+    },
     summary: {
       type: Type.STRING,
       description: "A 2-3 sentence executive summary of the most critical digital marketing and AI findings, framed as opportunities for Outsource.dk."
@@ -82,6 +107,7 @@ const auditSchema = {
     'overallPotential',
     'summary',
     'advertisingOptimization',
+    'googleMyBusiness',
   ]
 };
 
@@ -91,7 +117,7 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
     Your task is to conduct a targeted audit of the website: ${url}.
     Your analysis must identify specific pain points that align directly with Outsource.dk's services. The audience is a salesperson who needs clear, actionable insights to initiate a conversation.
 
-    Evaluate the following 6 categories. Provide a score from 0 to 100 for the first 5, and a concise, actionable comment IN DANISH for each category.
+    Evaluate the following categories. Provide a score from 0 to 100 for the first 5, and a concise, actionable comment IN DANISH for each category.
 
     1.  **Hjemmeside & Brugeroplevelse (Website & UX):**
         - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around Outsource.dk's ability to build a high-converting website.
@@ -101,8 +127,9 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
 
     3.  **Digital Marketing Tilstedeværelse (Digital Marketing Presence):**
         - Look for social media links (Facebook, Instagram, LinkedIn, X, TikTok, etc.). For each platform found, find and list the number of followers (use 'Ukendt' if not found).
+        - CRITICAL: Search for the company's Trustpilot page and their Google Business Profile. If found, extract their overall score (e.g., '4.5/5') and total number of reviews (e.g., '1,234 anmeldelser'). Omit if not found.
         - Check for newsletters, and tracking pixels to gauge their marketing activity.
-        - Frame the comment to suggest growth via integrated campaigns, and comment on their social media strength based on follower counts.
+        - Frame the comment to suggest growth via integrated campaigns, and comment on their online reputation based on the review scores.
 
     4.  **Indhold & Kommunikation (Content & Communication):**
         - Evaluate copy, tone-of-voice, and value. Frame comment by connecting strong content to building trust and authority.
@@ -113,12 +140,19 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
     6.  **Annoncering & Optimering (Advertising & Optimization):**
         - This section should NOT have a score.
         - Scan for evidence of Google Ads (e.g., gclid parameters) and Meta Ads (Facebook Pixel).
-        - CRITICAL: To provide context, you MUST research and include relevant industry benchmarks for a similar business in Denmark (e.g., average Click-Through Rate (CTR) or Conversion Rate for their specific sector). This context is vital.
+        - CRITICAL: To provide context, you MUST research and include **specific** industry benchmarks for a similar business in Denmark. For example, if the site is for a **SaaS company, find the average conversion rate for SaaS in Denmark. If it's e-commerce, find average e-commerce CTRs. If it's a local service business (like a plumber), find average Cost-Per-Lead.** This specific context is vital for a high-quality analysis.
         - Based on your findings:
           - If ad evidence is found, provide a concise summary of their current advertising strategy and compare their likely performance against the industry benchmarks you found.
           - If no ad evidence is found, state that this is a major untapped opportunity, using the industry benchmarks to quantify what they are missing out on.
         - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their results. These should be specific and data-driven.
         - Frame this entire section as a major growth opportunity.
+    
+    7. **Google My Business Optimering:**
+        - This section should NOT have a score.
+        - Search for the company's Google Business Profile (GMB).
+        - Analyze its completeness: review count & rating, response rate to reviews, photo quality and quantity, recent posts, and accuracy of business information (NAP).
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their GMB listing for better local visibility.
+        - Frame this as a critical component for local SEO and attracting nearby customers.
 
     Finally, provide an "Overall Potential" score (0-100) indicating how likely this prospect is a good fit for Outsource.dk.
     Also, write a 2-3 sentence executive summary of the most critical findings.
@@ -165,7 +199,7 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     The pitch is for a meeting booker from Outsource.dk. The goal is to secure a meeting.
     Each pitch should highlight a key pain point from the audit but from a different angle.
 
-    - **Variation 1 (Data-Driven):** Focus heavily on the specific numbers and benchmarks from the 'advertisingOptimization' section. Be direct and analytical.
+    - **Variation 1 (Data-Driven):** Focus heavily on the specific numbers and benchmarks from the 'advertisingOptimization' or 'googleMyBusiness' sections. Be direct and analytical.
     - **Variation 2 (Rapport-Building):** Start with a genuine compliment and frame the opportunity in a more collaborative, less aggressive way.
     - **Variation 3 (Urgency-Focused):** Emphasize the risk of inaction and what they are losing to competitors by not addressing the identified issues.
 

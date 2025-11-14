@@ -109,6 +109,13 @@ const AdvertisingIconComponent: React.FC<IconProps> = (props) => (
 );
 export const AdvertisingIcon = React.memo(AdvertisingIconComponent);
 
+const GmbIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m21 7-4-4-4 4"/><path d="M17 3v11a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2Z"/><path d="M7 21v-2"/><path d="M11 21v-2"/>
+    </svg>
+);
+export const GmbIcon = React.memo(GmbIconComponent);
+
 const FacebookIconComponent: React.FC<IconProps> = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -174,3 +181,17 @@ const RedditIconComponent: React.FC<IconProps> = (props) => (
     </svg>
 );
 export const RedditIcon = React.memo(RedditIconComponent);
+
+const TrustpilotIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M22.612 8.162l-6.13 1.05L13.565 3.3a1.002 1.002 0 00-1.787 0l-2.917 5.912-6.13-1.05a1 1 0 00-1.15.973l1.05 6.13-5.912 2.917a1.002 1.002 0 000 1.787l5.912 2.917-1.05 6.13a1 1 0 00.974 1.15.99.99 0 00.176 0l6.13-1.05 2.917 5.912a1.002 1.002 0 001.787 0l2.917-5.912 6.13 1.05a1 1 0 001.15-.973l-1.05-6.13 5.912-2.917a1.002 1.002 0 000-1.787l-5.912-2.917 1.05-6.13a1 1 0 00-.973-1.15zM9.825 15.15l-2.437-2.438a1 1 0 011.412-1.412l1.732 1.73 3.562-4.75a1.002 1.002 0 011.59 1.192l-4.25 5.667a1 1 0 01-1.61-.003z"/>
+    </svg>
+);
+export const TrustpilotIcon = React.memo(TrustpilotIconComponent);
+
+const GoogleIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.19,4.73C14.76,4.73 16.04,5.7 16.96,6.55L19.28,4.23C17.2,2.3 14.76,1 12.19,1C6.9,1 3,5.58 3,12C3,18.42 6.9,23 12.19,23C17.62,23 21.5,19.33 21.5,13.83C21.5,12.57 21.43,11.8 21.35,11.1Z"/>
+    </svg>
+);
+export const GoogleIcon = React.memo(GoogleIconComponent);

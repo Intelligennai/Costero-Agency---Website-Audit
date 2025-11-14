@@ -92,6 +92,29 @@ const App: React.FC = () => {
             scale: 2,
             backgroundColor: '#0D1B2A', // brand-primary color
             useCORS: true,
+            onclone: (clonedDoc) => {
+                // Hide elements with 'no-print' class in the cloned document
+                // to ensure they are not captured in the PDF.
+                clonedDoc.querySelectorAll('.no-print').forEach((node) => {
+                    if (node instanceof HTMLElement) {
+                        node.style.visibility = 'hidden';
+                        node.style.display = 'none';
+                    }
+                });
+
+                // Disable animations on the main container to ensure a static capture.
+                const clonedReportContent = clonedDoc.getElementById('report-content');
+                if (clonedReportContent) {
+                    clonedReportContent.style.animation = 'none';
+                    // Also disable animation on child elements if necessary
+                    const animatedChildren = clonedReportContent.querySelectorAll('[class*="animate-"]');
+                    animatedChildren.forEach(child => {
+                      if (child instanceof HTMLElement) {
+                        child.style.animation = 'none';
+                      }
+                    });
+                }
+            },
         });
 
         const imgData = canvas.toDataURL('image/png');

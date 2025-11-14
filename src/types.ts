@@ -1,4 +1,3 @@
-
 export interface AuditSection {
   score: number;
   comment: string;
@@ -9,8 +8,15 @@ export interface SocialMediaStat {
   followers: string;
 }
 
+export interface ReviewStats {
+  score: string;
+  reviewCount: string;
+}
+
 export interface DigitalMarketingSection extends AuditSection {
   socialMediaStats: SocialMediaStat[];
+  trustpilot?: ReviewStats;
+  googleReviews?: ReviewStats;
 }
 
 export interface AnalysisSection {
@@ -26,12 +32,5 @@ export interface AuditReportData {
   overallPotential: AuditSection;
   summary: string;
   advertisingOptimization: AnalysisSection;
-}
-
-export interface HistoryItem {
-  id: string;
-  url: string;
-  reportData: AuditReportData;
-  pitch: string;
-  timestamp: string;
+  googleMyBusiness: AnalysisSection;
 }

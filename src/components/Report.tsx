@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import type { AuditReportData, AuditSection, DigitalMarketingSection } from '../types';
+import type { AuditReportData, DigitalMarketingSection } from '../types';
 import { ReportSection } from './ReportSection';
 import { ScoreDonutChart } from './ScoreDonutChart';
-import { DownloadIcon, WebsiteIcon, SeoIcon, MarketingIcon, ContentIcon, PotentialIcon, AiIcon, AdvertisingIcon, LoaderIcon } from './Icons';
+import { DownloadIcon, WebsiteIcon, SeoIcon, MarketingIcon, ContentIcon, PotentialIcon, AiIcon, AdvertisingIcon, LoaderIcon, GmbIcon } from './Icons';
 
 interface ReportProps {
   data: AuditReportData;
@@ -84,8 +84,8 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrint, isPrinting
         {/* The rest of the sections flow into the grid, creating the two-column layout */}
         {reportSections.slice(1).map((section, index) => {
            if (!section.data) return null;
-            const socialStats = section.title === 'Digital Marketing' 
-            ? (section.data as DigitalMarketingSection).socialMediaStats 
+            const digitalMarketingData = section.title === 'Digital Marketing' 
+            ? (section.data as DigitalMarketingSection) 
             : undefined;
 
             return (
@@ -95,17 +95,29 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrint, isPrinting
                 score={section.data.score}
                 comment={section.data.comment}
                 icon={section.icon}
-                socialMediaStats={socialStats}
+                socialMediaStats={digitalMarketingData?.socialMediaStats}
+                trustpilot={digitalMarketingData?.trustpilot}
+                googleReviews={digitalMarketingData?.googleReviews}
               />
             )
         })}
         
-        {/* The advertising section spans the full width at the bottom */}
+        {/* The advertising section spans the full width */}
         {data.advertisingOptimization && (
           <ReportSection
             title="Annoncering & Optimering"
             comment={data.advertisingOptimization.comment}
             icon={<AdvertisingIcon className="w-6 h-6" />}
+            className="md:col-span-2"
+          />
+        )}
+
+        {/* The Google My Business section spans the full width */}
+        {data.googleMyBusiness && (
+          <ReportSection
+            title="Google My Business"
+            comment={data.googleMyBusiness.comment}
+            icon={<GmbIcon className="w-6 h-6" />}
             className="md:col-span-2"
           />
         )}
