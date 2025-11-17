@@ -11,26 +11,29 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Restored public access modifier. Implicit modifiers can sometimes be misinterpreted by build tools.
-  public state: State = {
-    hasError: false,
-    error: null,
-  };
+  // Using a constructor for state initialization to ensure `this.props` is correctly typed.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+    };
+  }
 
-  // FIX: Restored public access modifier.
-  public static getDerivedStateFromError(error: Error): State {
+  // FIX: Removed explicit public modifier.
+  static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
 
-  // FIX: Restored public access modifier.
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Removed explicit public modifier.
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  // FIX: Restored public access modifier.
-  public render() {
+  // FIX: Removed explicit public modifier.
+  render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
