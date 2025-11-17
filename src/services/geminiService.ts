@@ -174,7 +174,7 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
 
   try {
       const response = await ai.models.generateContent({
-        model: 'gemini-flash-lite-latest',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -247,7 +247,7 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
 
   try {
       const response = await ai.models.generateContent({
-        model: 'gemini-flash-lite-latest',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -291,7 +291,7 @@ export const createChatSession = (): Chat => {
     The user is likely a salesperson or meeting booker. Frame your answers to be helpful for their role.`;
 
     return ai.chats.create({
-        model: 'gemini-flash-lite-latest',
+        model: 'gemini-2.5-flash',
         config: {
             systemInstruction,
         },

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import type { ChatMessage } from '../types';
 import { CloseIcon, SendIcon, BotIcon, UserIcon } from './Icons';
@@ -24,7 +23,6 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
-      // Focus input when modal opens
       setTimeout(() => inputRef.current?.focus(), 100); 
     }
   }, [isOpen, messages, isLoading]);
@@ -32,7 +30,7 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim()) {
+    if (input.trim() && !isLoading) {
       onSendMessage(input);
       setInput('');
     }
