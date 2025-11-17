@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon } from './Icons';
-import SkeletonLoader from './SkeletonLoader';
 
 interface CallNotesProps {
   url: string;
@@ -10,33 +9,26 @@ interface CallNotesProps {
 const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   const [notes, setNotes] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const [isHydrating, setIsHydrating] = useState(true);
   const isInitialMount = useRef(true);
 
   const storageKey = `call_notes_${url}`;
 
   // Load initial notes from localStorage
   useEffect(() => {
-    setIsHydrating(true);
-    const timer = setTimeout(() => {
-        try {
-            const savedNotes = localStorage.getItem(storageKey) || '';
-            setNotes(savedNotes);
-        } catch (error) {
-            console.error("Failed to read from localStorage", error);
-            setNotes('');
-        }
-        setIsHydrating(false);
-        isInitialMount.current = true;
-        setSaveStatus('idle');
-    }, 50); // Small delay to allow skeleton to render
-
-    return () => clearTimeout(timer);
+    try {
+      const savedNotes = localStorage.getItem(storageKey) || '';
+      setNotes(savedNotes);
+    } catch (error) {
+      console.error("Failed to read from localStorage", error);
+      setNotes('');
+    }
+    isInitialMount.current = true;
+    setSaveStatus('idle');
   }, [storageKey]);
 
   // Auto-save notes with debounce
   useEffect(() => {
-    if (isInitialMount.current || isHydrating) {
+    if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
@@ -54,14 +46,13 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
     }, 1000); // 1-second debounce
 
     return () => clearTimeout(timer);
-  }, [notes, storageKey, isHydrating]);
+  }, [notes, storageKey]);
 
   const handleClear = useCallback(() => {
     if (window.confirm('Are you sure you want to delete all notes for this URL? This cannot be undone.')) {
       try {
         localStorage.removeItem(storageKey);
         setNotes('');
-        setSaveStatus('idle');
       } catch (error) {
         console.error("Failed to clear from localStorage", error);
       }
@@ -72,7 +63,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
     switch (saveStatus) {
       case 'saving':
         return (
-          <span className="text-gray-500 dark:text-brand-light flex items-center gap-2 text-sm animate-fade-in">
+          <span className="text-brand-light flex items-center gap-2 text-sm animate-fade-in">
             <LoaderIcon className="w-4 h-4 animate-spin" />
             Saving...
           </span>
@@ -85,9 +76,9 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
           </span>
         );
       case 'idle':
-        if (!isInitialMount.current && notes.length > 0 && !isHydrating) {
+        if (!isInitialMount.current && notes.length > 0) {
             return (
-                <span className="text-gray-500/70 dark:text-brand-light/70 flex items-center gap-2 text-sm">
+                <span className="text-brand-light/70 flex items-center gap-2 text-sm">
                     <CheckIcon className="w-4 h-4" />
                     All changes saved
                 </span>
@@ -100,9 +91,9 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   };
 
   return (
-    <div className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
+    <div className="mt-8 bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-bold text-gray-700 dark:text-brand-light flex items-center gap-2">
+        <h3 className="text-2xl font-bold text-brand-light flex items-center gap-2">
           <NotesIcon className="w-6 h-6 text-brand-cyan" />
           Call Notes
         </h3>
@@ -111,22 +102,18 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         </div>
       </div>
 
-      {isHydrating ? (
-        <SkeletonLoader className="w-full h-48 rounded-md" />
-      ) : (
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Type your notes here... they will be saved automatically for this specific URL."
-          className="w-full h-48 p-3 bg-white dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-md text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
-          aria-label="Call Notes"
-        />
-      )}
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Type your notes here... they will be saved automatically for this specific URL."
+        className="w-full h-48 p-3 bg-brand-primary border-2 border-brand-accent rounded-md text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
+        aria-label="Call Notes"
+      />
       <div className="flex items-center justify-end mt-4">
         <button
           onClick={handleClear}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-500 dark:text-brand-light rounded-md hover:bg-brand-red hover:text-white dark:hover:text-brand-text transition-colors disabled:opacity-50"
-          disabled={notes.length === 0 || isHydrating}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-light rounded-md hover:bg-brand-red hover:text-brand-text transition-colors disabled:opacity-50"
+          disabled={notes.length === 0}
           title="Clear all notes for this URL"
         >
           <TrashIcon className="w-4 h-4" />

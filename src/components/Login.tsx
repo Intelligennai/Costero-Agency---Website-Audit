@@ -54,12 +54,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-md p-8 space-y-8 bg-brand-secondary rounded-xl shadow-lg animate-fade-in">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-brand-secondary rounded-xl shadow-lg animate-fade-in">
         <div className="text-center">
-            <h1 className="text-3xl font-bold text-brand-text mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-brand-text mb-2">
                 {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h1>
-            <p className="text-brand-light">
+            <p className="text-gray-500 dark:text-brand-light">
                 {mode === 'login' ? 'Please enter the password to access the tool.' : 'Sign up to start auditing websites.'}
             </p>
         </div>
@@ -67,7 +67,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
           {mode === 'register' && (
              <div className="relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <UserIcon className="h-5 w-5 text-brand-light" />
+                    <UserIcon className="h-5 w-5 text-gray-400 dark:text-brand-light" />
                  </div>
                  <input
                   id="email"
@@ -77,7 +77,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-brand-primary border-2 border-brand-accent rounded-lg text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
                   placeholder="Email address"
                   disabled={isLoading}
                 />
@@ -86,7 +86,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
 
           <div className="relative">
              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <LockIcon className="h-5 w-5 text-brand-light" />
+                <LockIcon className="h-5 w-5 text-gray-400 dark:text-brand-light" />
              </div>
              <input
               id="password"
@@ -96,7 +96,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-brand-primary border-2 border-brand-accent rounded-lg text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
+              className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
               placeholder="Password"
               disabled={isLoading}
             />
@@ -105,7 +105,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
           {mode === 'register' && (
             <div className="relative">
                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <LockIcon className="h-5 w-5 text-brand-light" />
+                  <LockIcon className="h-5 w-5 text-gray-400 dark:text-brand-light" />
                </div>
                <input
                 id="confirm-password"
@@ -115,7 +115,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-brand-primary border-2 border-brand-accent rounded-lg text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
+                className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
                 placeholder="Confirm Password"
                 disabled={isLoading}
               />
@@ -130,7 +130,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-brand-primary bg-brand-cyan hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-brand-primary bg-brand-cyan hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -144,7 +144,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
           </div>
         </form>
 
-        <p className="text-center text-sm text-brand-light">
+        <p className="text-center text-sm text-gray-500 dark:text-brand-light">
           {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
           <button onClick={toggleMode} className="font-semibold text-brand-cyan hover:underline ml-1 focus:outline-none">
             {mode === 'login' ? 'Sign Up' : 'Log In'}

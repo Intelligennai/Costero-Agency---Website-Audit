@@ -2,6 +2,8 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { AuditReportData } from '../types';
 
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
 // Custom error classes for more specific feedback
 class ApiError extends Error {
   constructor(message: string) {
@@ -16,47 +18,6 @@ class InvalidResponseError extends ApiError {
     this.name = 'InvalidResponseError';
   }
 }
-
-// Custom error classes for the simulated login process
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
-export class InvalidCredentialsError extends AuthError {
-  constructor() {
-    super('Invalid password. Please try again.');
-    this.name = 'InvalidCredentialsError';
-  }
-}
-export class NetworkError extends AuthError {
-  constructor() {
-    super('A network error occurred. Please check your connection and try again.');
-    this.name = 'NetworkError';
-  }
-}
-export class ServerError extends AuthError {
-  constructor() {
-    super('The authentication service is currently unavailable. Please try again later.');
-    this.name = 'ServerError';
-  }
-}
-export class EmailExistsError extends AuthError {
-    constructor() {
-        super('An account with this email already exists. Please log in.');
-        this.name = 'EmailExistsError';
-    }
-}
-export class WeakPasswordError extends AuthError {
-    constructor() {
-        super('Password must be at least 8 characters long.');
-        this.name = 'WeakPasswordError';
-    }
-}
-
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const auditSectionSchema = {
   type: Type.OBJECT,
@@ -210,9 +171,10 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
 
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
+
   try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-lite-latest',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -282,9 +244,10 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
 
     Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
   `;
+
   try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-lite-latest',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -328,7 +291,7 @@ export const createChatSession = (): Chat => {
     The user is likely a salesperson or meeting booker. Frame your answers to be helpful for their role.`;
 
     return ai.chats.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-lite-latest',
         config: {
             systemInstruction,
         },

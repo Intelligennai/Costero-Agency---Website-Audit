@@ -7,6 +7,7 @@ import { GithubIcon, LoaderIcon, ServerCrashIcon } from './components/Icons';
 
 const Report = lazy(() => import('./components/Report').then(module => ({ default: module.Report })));
 const PitchGenerator = lazy(() => import('./components/PitchGenerator').then(module => ({ default: module.PitchGenerator })));
+const CallNotes = lazy(() => import('./components/CallNotes').then(module => ({ default: module.CallNotes })));
 
 
 const App: React.FC = () => {
@@ -200,6 +201,7 @@ const App: React.FC = () => {
                 pitches={pitches} 
                 isLoading={isPitchLoading}
               />
+              <CallNotes url={url} />
             </div>
           )}
         </Suspense>

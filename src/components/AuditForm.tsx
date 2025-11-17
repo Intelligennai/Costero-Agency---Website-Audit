@@ -55,17 +55,17 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
     <div className="w-full">
       <form onSubmit={handleSubmit} className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <SearchIcon className="h-5 w-5 text-brand-light" />
+          <SearchIcon className="h-5 w-5 text-gray-400 dark:text-brand-light" />
         </div>
         <input
           type="text"
           value={url}
           onChange={handleChange}
           placeholder="e.g., example.com"
-          className={`w-full pl-12 pr-32 py-4 bg-brand-secondary border-2 rounded-full text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 transition-all ${
+          className={`w-full pl-12 pr-32 py-4 bg-white dark:bg-brand-secondary border-2 rounded-full text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 transition-all ${
             error
               ? 'border-brand-red focus:ring-brand-red'
-              : 'border-brand-accent focus:ring-brand-cyan'
+              : 'border-gray-300 dark:border-brand-accent focus:ring-brand-cyan'
           }`}
           disabled={isLoading}
           aria-invalid={!!error}
@@ -74,7 +74,7 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
         <button
           type="submit"
           disabled={isLoading}
-          className="absolute inset-y-0 right-0 m-2 px-6 py-2 bg-brand-cyan text-brand-primary font-bold rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute inset-y-0 right-0 m-2 px-6 py-2 bg-brand-cyan text-brand-primary font-bold rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Analyzing...' : 'Analyze'}
         </button>
