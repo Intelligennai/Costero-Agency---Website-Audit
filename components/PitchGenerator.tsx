@@ -7,11 +7,10 @@ interface PitchGeneratorProps {
   isLoading: boolean;
 }
 
-export const PitchGenerator: React.FC<PitchGeneratorProps> = ({ onGenerate, pitches, isLoading }) => {
+const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pitches, isLoading }) => {
   const [selectedPitchIndex, setSelectedPitchIndex] = useState(0);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  // Reset selected pitch when new pitches are generated or cleared
   useEffect(() => {
     setSelectedPitchIndex(0);
     setCopiedIndex(null);
@@ -49,7 +48,6 @@ export const PitchGenerator: React.FC<PitchGeneratorProps> = ({ onGenerate, pitc
       
       {hasPitches && (
         <div className="animate-fade-in">
-          {/* RADIO BUTTONS AS SEGMENTED CONTROL */}
           <div className="flex space-x-2 p-1 bg-brand-accent/20 rounded-lg mb-4">
              {pitches.map((_, index) => (
               <div key={index} className="flex-1">
@@ -76,7 +74,6 @@ export const PitchGenerator: React.FC<PitchGeneratorProps> = ({ onGenerate, pitc
             ))}
           </div>
           
-          {/* CONTENT AREA */}
           <div className="relative bg-brand-primary p-4 rounded-md">
              <button
                 onClick={() => handleCopy(selectedPitchIndex)}
@@ -103,3 +100,5 @@ export const PitchGenerator: React.FC<PitchGeneratorProps> = ({ onGenerate, pitc
     </div>
   );
 };
+
+export const PitchGenerator = React.memo(PitchGeneratorComponent);

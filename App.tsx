@@ -1,19 +1,21 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { AuditForm } from './components/AuditForm';
-import { Report } from './components/Report';
-import { PitchGenerator } from './components/PitchGenerator';
 import { generateAuditReport, generateSalesPitch } from './services/geminiService';
 import type { AuditReportData } from './types';
 import { GithubIcon, LoaderIcon, ServerCrashIcon } from './components/Icons';
 
+const Report = lazy(() => import('./components/Report').then(module => ({ default: module.Report })));
+const PitchGenerator = lazy(() => import('./components/PitchGenerator').then(module => ({ default: module.PitchGenerator })));
+
+
 const App: React.FC = () => {
   const [url, setUrl] = useState<string>('');
   const [reportData, setReportData] = useState<AuditReportData | null>(null);
-  // FIX: Updated state to handle multiple pitches as an array.
   const [pitches, setPitches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPitchLoading, setIsPitchLoading] = useState<boolean>(false);
+  const [isPrinting, setIsPrinting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loadingMessage, setLoadingMessage] = useState<string>('');
 
@@ -35,7 +37,6 @@ const App: React.FC = () => {
     setIsLoading(true);
     setError('');
     setReportData(null);
-    // FIX: Clearing the pitches array for a new audit.
     setPitches([]);
     setUrl(domain);
 
@@ -53,10 +54,8 @@ const App: React.FC = () => {
   const handleGeneratePitch = useCallback(async () => {
     if (!reportData) return;
     setIsPitchLoading(true);
-    // FIX: Clearing the pitches array before generating new ones.
     setPitches([]);
     try {
-      // FIX: The service now returns an array of pitches.
       const generatedPitches = await generateSalesPitch(reportData);
       setPitches(generatedPitches);
     } catch (e) {
@@ -80,11 +79,84 @@ const App: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isLoading, loadingMessages]);
+  }, [isLoading]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = useCallback(async () => {
+    const reportElement = document.getElementById('report-content');
+    if (!reportElement || !url) return;
+    
+    setIsPrinting(true);
+
+    try {
+        const { default: html2canvas } = await import('html2canvas');
+        const { default: jsPDF } = await import('jspdf');
+
+        const canvas = await html2canvas(reportElement, {
+            scale: 2,
+            backgroundColor: '#0D1B2A', // brand-primary color
+            useCORS: true,
+            onclone: (clonedDoc) => {
+                // Hide elements with 'no-print' class in the cloned document
+                // to ensure they are not captured in the PDF.
+                clonedDoc.querySelectorAll('.no-print').forEach((node) => {
+                    if (node instanceof HTMLElement) {
+                        node.style.visibility = 'hidden';
+                        node.style.display = 'none';
+                    }
+                });
+
+                // Disable animations on the main container to ensure a static capture.
+                const clonedReportContent = clonedDoc.getElementById('report-content');
+                if (clonedReportContent) {
+                    clonedReportContent.style.animation = 'none';
+                    // Also disable animation on child elements if necessary
+                    const animatedChildren = clonedReportContent.querySelectorAll('[class*="animate-"]');
+                    animatedChildren.forEach(child => {
+                      if (child instanceof HTMLElement) {
+                        child.style.animation = 'none';
+                      }
+                    });
+                }
+            },
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+        
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+            position = -heightLeft;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        const cleanUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        pdf.save(`Website-Audit-${cleanUrl}.pdf`);
+
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        setError("Sorry, there was an issue creating the PDF. Please try the browser's print function (Ctrl/Cmd + P).");
+    } finally {
+        setIsPrinting(false);
+    }
+}, [url]);
+
 
   return (
     <div className="min-h-screen bg-brand-primary font-sans">
@@ -114,17 +186,23 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {reportData && !isLoading && (
-          <div id="report-content" className="mt-8 animate-fade-in print-container">
-            <Report data={reportData} url={url} onPrint={handlePrint} />
-            <PitchGenerator 
-              onGenerate={handleGeneratePitch} 
-              // FIX: Correct prop 'pitches' is now passed with an array of strings.
-              pitches={pitches} 
-              isLoading={isPitchLoading}
-            />
+        <Suspense fallback={
+          <div className="flex flex-col items-center justify-center text-center mt-12 animate-fade-in">
+            <LoaderIcon className="w-16 h-16 animate-spin text-brand-cyan" />
+            <p className="mt-4 text-xl font-semibold">Loading Report...</p>
           </div>
-        )}
+        }>
+          {reportData && !isLoading && (
+            <div id="report-content" className="mt-8 animate-fade-in print-container">
+              <Report data={reportData} url={url} onPrint={handlePrint} isPrinting={isPrinting} />
+              <PitchGenerator 
+                onGenerate={handleGeneratePitch} 
+                pitches={pitches} 
+                isLoading={isPitchLoading}
+              />
+            </div>
+          )}
+        </Suspense>
       </main>
       <footer className="text-center p-4 mt-8 text-brand-accent border-t border-brand-accent/20 no-print">
         <a href="https://github.com/google-gemini-v2" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-brand-cyan transition-colors">

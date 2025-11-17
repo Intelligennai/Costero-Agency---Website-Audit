@@ -1,11 +1,23 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import type { AuditReportData } from '../types';
 
-if (!import.meta.env.VITE_API_KEY) {
-  throw new Error("VITE_API_KEY environment variable not set. Please set it in your .env file for local development or in your hosting provider's environment variable settings.");
+// Custom error classes for more specific feedback
+class ApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
 }
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+class InvalidResponseError extends ApiError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidResponseError';
+  }
+}
+
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const auditSectionSchema = {
   type: Type.OBJECT,
@@ -159,22 +171,41 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
 
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
-    contents: prompt,
-    config: {
-      responseMimeType: 'application/json',
-      responseSchema: auditSchema,
-    },
-  });
-
-  const jsonText = response.text.trim();
   try {
-    return JSON.parse(jsonText) as AuditReportData;
-  } catch (e) {
-    console.error("Failed to parse JSON response:", jsonText);
-    throw new Error("The AI returned an invalid JSON format.");
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: auditSchema,
+        },
+      });
+
+      const jsonText = response.text.trim();
+      try {
+        return JSON.parse(jsonText) as AuditReportData;
+      } catch (e) {
+        console.error("Failed to parse JSON response:", jsonText);
+        throw new InvalidResponseError("The AI returned an invalid data format. The report could not be displayed.");
+      }
+  } catch (error) {
+      console.error("Error calling Gemini API for audit report:", error);
+      if (error instanceof Error) {
+            if (error.message.includes('429')) {
+              throw new ApiError('Too many requests sent in a short period. Please wait a moment before trying again.');
+            }
+            if (error.message.includes('500') || error.message.includes('503')) {
+                throw new ApiError('The AI service is currently experiencing issues or is overloaded. Please try again later.');
+            }
+            if (error.message.toLowerCase().includes('safety')) {
+                throw new ApiError('The request was blocked due to safety settings, which can sometimes happen with certain URLs. Please try a different website.');
+            }
+            if (error.message.includes('400')) {
+                throw new ApiError('There was a problem with the request sent to the AI (Bad Request). Please check the URL and try again.');
+            }
+      }
+      // Generic catch-all
+      throw new ApiError('Failed to generate the audit report due to an unknown API error. Please try again.');
   }
 };
 
@@ -212,22 +243,40 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
 
     Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
   `;
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: prompt,
-    config: {
-      responseMimeType: 'application/json',
-      responseSchema: pitchSchema,
-    },
-  });
-
-  const jsonText = response.text.trim();
   try {
-    const parsed = JSON.parse(jsonText);
-    return parsed.pitches as string[];
-  } catch (e) {
-    console.error("Failed to parse JSON response for pitches:", jsonText);
-    throw new Error("The AI returned an invalid JSON format for the sales pitch.");
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: pitchSchema,
+        },
+      });
+
+      const jsonText = response.text.trim();
+      try {
+        const parsed = JSON.parse(jsonText);
+        return parsed.pitches as string[];
+      } catch (e) {
+        console.error("Failed to parse JSON response for pitches:", jsonText);
+        throw new InvalidResponseError("The AI returned an invalid data format for the sales pitch.");
+      }
+  } catch (error) {
+      console.error("Error calling Gemini API for sales pitch:", error);
+      if (error instanceof Error) {
+          if (error.message.includes('429')) {
+              throw new ApiError('Too many requests sent in a short period. Please wait a moment before trying again.');
+          }
+          if (error.message.includes('500') || error.message.includes('503')) {
+              throw new ApiError('The AI service is currently experiencing issues or is overloaded. Please try again later.');
+          }
+          if (error.message.toLowerCase().includes('safety')) {
+              throw new ApiError('The pitch generation was blocked due to safety settings.');
+          }
+           if (error.message.includes('400')) {
+                throw new ApiError('There was a problem with the request sent to the AI for pitch generation (Bad Request).');
+            }
+      }
+      throw new ApiError('Failed to generate sales pitch due to an unknown API error.');
   }
 };

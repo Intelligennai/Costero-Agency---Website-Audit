@@ -1,1 +1,6 @@
-{}
+{
+  "protection": {
+    "type": "password",
+    "password": "@protection-password"
+  }
+}

@@ -6,7 +6,7 @@ interface ScoreDonutChartProps {
   score: number;
 }
 
-export const ScoreDonutChart: React.FC<ScoreDonutChartProps> = ({ score }) => {
+const ScoreDonutChartComponent: React.FC<ScoreDonutChartProps> = ({ score }) => {
   const data = [
     { name: 'Score', value: score },
     { name: 'Remaining', value: 100 - score },
@@ -51,3 +51,5 @@ export const ScoreDonutChart: React.FC<ScoreDonutChartProps> = ({ score }) => {
     </div>
   );
 };
+
+export const ScoreDonutChart = React.memo(ScoreDonutChartComponent);
