@@ -22,16 +22,16 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrint, isPrinting
   ], [data]);
 
   return (
-    <div className="bg-brand-secondary rounded-lg shadow-2xl p-6 md:p-8 animate-slide-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-brand-accent">
+    <div className="bg-white dark:bg-brand-secondary rounded-lg shadow-2xl p-6 md:p-8 animate-slide-in">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-gray-200 dark:border-brand-accent">
         <div>
-          <h2 className="text-3xl font-bold text-brand-text">Audit Report</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-brand-text">Audit Report</h2>
           <a href={`https://${url.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="text-lg text-brand-cyan hover:underline">{url}</a>
         </div>
         <button
           onClick={onPrint}
           disabled={isPrinting}
-          className="no-print mt-4 md:mt-0 flex items-center justify-center gap-2 px-6 py-2 bg-brand-cyan text-brand-primary font-bold rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-wait"
+          className="no-print mt-4 md:mt-0 flex items-center justify-center gap-2 px-6 py-2 bg-brand-cyan text-brand-primary font-bold rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-wait"
         >
           {isPrinting ? (
             <>
@@ -48,13 +48,13 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrint, isPrinting
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div data-section-id="summary" className="md:col-span-2 bg-brand-primary/50 p-6 rounded-lg">
-          <h3 className="text-2xl font-bold mb-4 text-brand-light">Executive Summary</h3>
-          <p className="text-brand-text text-lg">{data.summary || 'An executive summary could not be generated.'}</p>
+        <div data-section-id="summary" className="md:col-span-2 bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg">
+          <h3 className="text-2xl font-bold mb-4 text-gray-700 dark:text-brand-light">Executive Summary</h3>
+          <p className="text-gray-800 dark:text-brand-text text-lg">{data.summary || 'An executive summary could not be generated.'}</p>
         </div>
 
-        <div data-section-id="overallPotential" className="flex flex-col items-center justify-center bg-brand-primary/50 p-6 rounded-lg print-break-inside-avoid">
-          <h3 className="text-2xl font-bold mb-4 text-brand-light flex items-center gap-2">
+        <div data-section-id="overallPotential" className="flex flex-col items-center justify-center bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg print-break-inside-avoid">
+          <h3 className="text-2xl font-bold mb-4 text-gray-700 dark:text-brand-light flex items-center gap-2">
             <span title="Overall Potential">
               <PotentialIcon className="w-7 h-7" />
             </span>
@@ -63,11 +63,11 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrint, isPrinting
           {data.overallPotential ? (
             <>
               <ScoreDonutChart score={data.overallPotential.score} />
-              <p className="text-center text-brand-light mt-4">{data.overallPotential.comment}</p>
+              <p className="text-center text-gray-600 dark:text-brand-light mt-4">{data.overallPotential.comment}</p>
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-brand-light">Not available</p>
+              <p className="text-gray-500 dark:text-brand-light">Not available</p>
             </div>
           )}
         </div>

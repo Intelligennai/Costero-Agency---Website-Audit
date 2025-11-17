@@ -73,7 +73,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
     switch (saveStatus) {
       case 'saving':
         return (
-          <span className="text-brand-light flex items-center gap-2 text-sm animate-fade-in">
+          <span className="text-gray-500 dark:text-brand-light flex items-center gap-2 text-sm animate-fade-in">
             <LoaderIcon className="w-4 h-4 animate-spin" />
             Saving...
           </span>
@@ -88,7 +88,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
       case 'idle':
         if (!isInitialMount.current && notes.length > 0) {
             return (
-                <span className="text-brand-light/70 flex items-center gap-2 text-sm">
+                <span className="text-gray-400 dark:text-brand-light/70 flex items-center gap-2 text-sm">
                     <CheckIcon className="w-4 h-4" />
                     All changes saved
                 </span>
@@ -101,9 +101,9 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   };
 
   return (
-    <div className="mt-8 bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
+    <div className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-bold text-brand-light flex items-center gap-2">
+        <h3 className="text-2xl font-bold text-gray-700 dark:text-brand-light flex items-center gap-2">
           <NotesIcon className="w-6 h-6 text-brand-cyan" />
           Call Notes
         </h3>
@@ -116,13 +116,13 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Type your notes here... they will be saved automatically for this specific URL."
-        className="w-full h-48 p-3 bg-brand-primary border-2 border-brand-accent rounded-md text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
+        className="w-full h-48 p-3 bg-white dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-md text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
         aria-label="Call Notes"
       />
       <div className="flex items-center justify-end mt-4 gap-2">
          <button
           onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-light rounded-md hover:bg-brand-accent hover:text-brand-text transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 dark:text-brand-light rounded-md hover:bg-gray-200 dark:hover:bg-brand-accent hover:text-gray-900 dark:hover:text-brand-text transition-colors disabled:opacity-50"
           disabled={!notes || isCopied}
           title="Copy notes to clipboard"
         >
@@ -140,7 +140,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         </button>
         <button
           onClick={handleClear}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-light rounded-md hover:bg-brand-red hover:text-brand-text transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 dark:text-brand-light rounded-md hover:bg-brand-red hover:text-white dark:hover:text-brand-text transition-colors disabled:opacity-50"
           disabled={notes.length === 0}
           title="Clear all notes for this URL"
         >

@@ -59,15 +59,15 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
       aria-labelledby="chatbot-heading"
     >
       <div 
-        className="w-full max-w-sm h-[70vh] flex flex-col bg-brand-secondary rounded-xl shadow-2xl animate-slide-in"
+        className="w-full max-w-sm h-[70vh] flex flex-col bg-white dark:bg-brand-secondary rounded-xl shadow-2xl animate-slide-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="flex items-center justify-between p-4 border-b border-brand-accent flex-shrink-0">
+        <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-brand-accent flex-shrink-0">
           <div className="flex items-center gap-3">
               <BotIcon className="w-6 h-6 text-brand-cyan" />
-              <h2 id="chatbot-heading" className="font-bold text-lg text-brand-text">AI Assistant</h2>
+              <h2 id="chatbot-heading" className="font-bold text-lg text-gray-900 dark:text-brand-text">AI Assistant</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full text-brand-light hover:bg-brand-accent transition-colors" aria-label="Close chat">
+          <button onClick={onClose} className="p-1 rounded-full text-gray-500 dark:text-brand-light hover:bg-gray-100 dark:hover:bg-brand-accent transition-colors" aria-label="Close chat">
             <CloseIcon className="w-6 h-6" />
           </button>
         </header>
@@ -75,21 +75,21 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
         <div className="flex-1 overflow-y-auto p-4 space-y-4" aria-live="polite">
           {messages.map((msg, index) => (
             <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
-              {msg.role === 'model' && <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center" aria-hidden="true"><BotIcon className="w-5 h-5 text-brand-cyan"/></div>}
-              <div className={`max-w-[80%] p-3 rounded-lg ${msg.role === 'user' ? 'bg-brand-cyan text-brand-primary' : 'bg-brand-primary text-brand-text'}`}>
+              {msg.role === 'model' && <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-brand-accent flex items-center justify-center" aria-hidden="true"><BotIcon className="w-5 h-5 text-brand-cyan"/></div>}
+              <div className={`max-w-[80%] p-3 rounded-lg ${msg.role === 'user' ? 'bg-brand-cyan text-brand-primary' : 'bg-gray-100 text-gray-800 dark:bg-brand-primary dark:text-brand-text'}`}>
                 <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
               </div>
-              {msg.role === 'user' && <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center" aria-hidden="true"><UserIcon className="w-5 h-5 text-brand-light"/></div>}
+              {msg.role === 'user' && <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-brand-accent flex items-center justify-center" aria-hidden="true"><UserIcon className="w-5 h-5 text-gray-600 dark:text-brand-light"/></div>}
             </div>
           ))}
           {isLoading && (
               <div className="flex items-start gap-3" aria-label="AI is typing">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-accent flex items-center justify-center" aria-hidden="true"><BotIcon className="w-5 h-5 text-brand-cyan"/></div>
-                  <div className="max-w-[80%] p-3 rounded-lg bg-brand-primary">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-brand-accent flex items-center justify-center" aria-hidden="true"><BotIcon className="w-5 h-5 text-brand-cyan"/></div>
+                  <div className={`max-w-[80%] p-3 rounded-lg bg-gray-100 dark:bg-brand-primary`}>
                       <div className="flex items-center justify-center space-x-1">
-                          <span className="w-2 h-2 bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0s' }}></span>
-                          <span className="w-2 h-2 bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
-                          <span className="w-2 h-2 bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></span>
+                          <span className="w-2 h-2 bg-gray-400 dark:bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0s' }}></span>
+                          <span className="w-2 h-2 bg-gray-400 dark:bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></span>
+                          <span className="w-2 h-2 bg-gray-400 dark:bg-brand-light rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></span>
                       </div>
                   </div>
               </div>
@@ -97,7 +97,7 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-4 border-t border-brand-accent flex-shrink-0">
+        <div className="p-4 border-t border-gray-200 dark:border-brand-accent flex-shrink-0">
           <form onSubmit={handleSend} className="flex items-center gap-3">
             <textarea
               ref={inputRef}
@@ -105,12 +105,12 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a question..."
-              className="flex-1 bg-brand-primary border-2 border-brand-accent rounded-lg p-2 text-sm text-brand-text placeholder-brand-light resize-none focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
+              className="flex-1 bg-white dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg p-2 text-sm text-gray-900 dark:text-brand-text placeholder-gray-500 dark:placeholder-brand-light resize-none focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
               rows={1}
               disabled={isLoading}
               aria-label="Chat message input"
             />
-            <button type="submit" disabled={isLoading || !input.trim()} className="p-2 bg-brand-cyan text-brand-primary rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Send message">
+            <button type="submit" disabled={isLoading || !input.trim()} className="p-2 bg-brand-cyan text-brand-primary rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Send message">
               <SendIcon className="w-5 h-5" />
             </button>
           </form>
