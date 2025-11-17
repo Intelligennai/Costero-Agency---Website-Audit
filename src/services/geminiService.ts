@@ -1,7 +1,24 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { AuditReportData } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Singleton instance, initialized lazily
+let ai: GoogleGenAI | null = null;
+
+/**
+ * Initializes and returns the GoogleGenAI client instance.
+ * Throws a specific, user-friendly error if the API key is missing.
+ */
+const getAiClient = (): GoogleGenAI => {
+    if (!process.env.API_KEY) {
+        // This error message is designed to be displayed directly in the UI.
+        throw new Error("API Key is missing. Please ensure the VITE_API_KEY environment variable is set in your deployment environment (e.g., Vercel project settings).");
+    }
+    if (!ai) {
+        ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    }
+    return ai;
+};
+
 
 const auditSectionSchema = {
   type: Type.OBJECT,
@@ -108,6 +125,7 @@ const auditSchema = {
 };
 
 export const generateAuditReport = async (url: string): Promise<AuditReportData> => {
+  const aiClient = getAiClient();
   const prompt = `
     Act as a senior digital marketing and AI consultant for Outsource.dk, a digital agency whose services cover Hjemmesider (Websites), Sociale medier (Social Media), Google Ads, SEO, E-mail marketing, AI Chatbots, and AI Workflows.
     Your task is to conduct a targeted audit of the website: ${url}.
@@ -160,7 +178,7 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  const response = await ai.models.generateContent({
+  const response = await aiClient.models.generateContent({
     // FIX: Upgraded model to gemini-2.5-pro for better analysis of complex tasks.
     model: 'gemini-2.5-pro',
     contents: prompt,
@@ -195,6 +213,7 @@ const pitchSchema = {
 };
 
 export const generateSalesPitch = async (reportData: AuditReportData): Promise<string[]> => {
+  const aiClient = getAiClient();
   const prompt = `
     Based on the following digital marketing audit report for a potential client, generate an array of 3 compelling and concise 30-second sales pitch variations in Danish.
     The pitch is for a meeting booker from Outsource.dk. The goal is to secure a meeting.
@@ -214,7 +233,7 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  const response = await ai.models.generateContent({
+  const response = await aiClient.models.generateContent({
     // FIX: Upgraded model to gemini-2.5-pro for higher quality pitch generation.
     model: 'gemini-2.5-pro',
     contents: prompt,
@@ -235,6 +254,7 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
 };
 
 export const createChatSession = (): Chat => {
+    const aiClient = getAiClient();
     const systemInstruction = `You are a friendly, expert AI assistant and sales coach for Outsource.dk, a digital marketing agency. Your primary goal is to help salespeople and meeting bookers understand the Website Audit AI report so they can effectively sell Outsource.dk's services.
 
     Always frame your answers to be helpful for a salesperson. This means connecting problems to solutions and identifying sales opportunities.
@@ -255,7 +275,7 @@ export const createChatSession = (): Chat => {
     4.  Maintain a professional, encouraging, and confident tone.
     5.  If you don't know an answer, politely say so. Do not make up information.`;
 
-    return ai.chats.create({
+    return aiClient.chats.create({
         model: 'gemini-flash-lite-latest',
         config: {
             systemInstruction,
