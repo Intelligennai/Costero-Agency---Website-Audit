@@ -11,20 +11,20 @@ export default defineConfig(({ command }) => {
       react(),
       isProduction && javascriptObfuscator({
         options: {
-          // A safer set of options that provides strong protection without breaking React.
+          // A safer set of options to prevent build errors with React.
+          // This disables the most complex transformations while still renaming variables
+          // and protecting strings, which is the main goal.
           compact: true,
           disableConsoleOutput: true,
-          identifierNamesGenerator: 'hexadecimal',
-          log: false,
-          renameGlobals: false,
-          rotateStringArray: true,
-          shuffleStringArray: true,
-          splitStrings: true,
-          splitStringsChunkLength: 10,
           stringArray: true,
           stringArrayEncoding: ['base64'],
           stringArrayThreshold: 0.75,
-          unicodeEscapeSequence: false
+          // The following options are disabled as they can interfere with React's internals.
+          splitStrings: false,
+          controlFlowFlattening: false,
+          deadCodeInjection: false,
+          selfDefending: false,
+          identifierNamesGenerator: 'hexadecimal',
         }
       })
     ],

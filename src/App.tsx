@@ -169,7 +169,7 @@ const App: React.FC = () => {
     setIsChatbotLoading(true);
 
     try {
-        // FIX: The `sendMessage` method expects an object with a `message` key.
+        // The `sendMessage` method expects an object with a `message` key.
         const response = await chatSession.current.sendMessage({ message });
         const text = response.text;
         setChatMessages(prev => [...prev, { role: 'model', text }]);
