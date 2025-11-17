@@ -11,26 +11,26 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Removed `public` modifier. It is the default and can sometimes cause issues with specific TypeScript configurations.
-  state: State = {
+  // FIX: Restored public access modifier. Implicit modifiers can sometimes be misinterpreted by build tools.
+  public state: State = {
     hasError: false,
     error: null,
   };
 
-  // FIX: Removed `public` modifier.
-  static getDerivedStateFromError(error: Error): State {
+  // FIX: Restored public access modifier.
+  public static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
 
-  // FIX: Removed `public` modifier.
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  // FIX: Restored public access modifier.
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  // FIX: Removed `public` modifier.
-  render() {
+  // FIX: Restored public access modifier.
+  public render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
