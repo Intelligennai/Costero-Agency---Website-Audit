@@ -1,9 +1,16 @@
-// FIX: Removed `/// <reference types="vite/client" />` as it was causing a "Cannot find type definition" error.
-// The manual definitions below are used instead to provide types for `import.meta.env`.
-interface ImportMetaEnv {
-  readonly VITE_API_KEY: string;
-}
+// FIX: Removed reference to "vite/client" to resolve "Cannot find type definition file" error.
+// The project does not appear to use Vite-specific client features typed by this file (e.g., import.meta.env).
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
+// Add type definitions for process.env variables that are injected by Vite.
+// This is necessary because the app uses `process.env.API_KEY` directly
+// in the client-side code, which is made possible by the `define` config
+// in `vite.config.ts`.
+// FIX: Changed `declare var process` to augment the existing `NodeJS.ProcessEnv`
+// interface. This avoids a conflict with pre-existing type definitions for `process`
+// and fixes the "Cannot redeclare block-scoped variable 'process'" error.
+declare namespace NodeJS {
+  interface ProcessEnv {
+    API_KEY: string;
+    [key: string]: string | undefined;
+  }
 }

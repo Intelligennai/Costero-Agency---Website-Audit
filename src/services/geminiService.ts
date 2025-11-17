@@ -1,6 +1,5 @@
-
 import { GoogleGenAI, Type, Chat } from "@google/genai";
-import type { AuditReportData } from '../types';
+import type { AuditReportData } from './types';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -241,7 +240,7 @@ export const createChatSession = (): Chat => {
     The user is likely a salesperson or meeting booker. Frame your answers to be helpful for their role.`;
 
     return ai.chats.create({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-lite-latest',
         config: {
             systemInstruction,
         },

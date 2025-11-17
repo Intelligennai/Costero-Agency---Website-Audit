@@ -1,13 +1,16 @@
 
-import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense, useRef } from 'react';
 import { AuditForm } from './components/AuditForm';
-import { generateAuditReport, generateSalesPitch } from './services/geminiService';
-import type { AuditReportData } from './types';
+import { generateAuditReport, generateSalesPitch, createChatSession } from './services/geminiService';
+import type { AuditReportData, ChatMessage } from './types';
 import { GithubIcon, LoaderIcon, ServerCrashIcon } from './components/Icons';
+import type { Chat } from '@google/genai';
 
 const Report = lazy(() => import('./components/Report').then(module => ({ default: module.Report })));
 const PitchGenerator = lazy(() => import('./components/PitchGenerator').then(module => ({ default: module.PitchGenerator })));
 const CallNotes = lazy(() => import('./components/CallNotes').then(module => ({ default: module.CallNotes })));
+const ChatbotTrigger = lazy(() => import('./components/ChatbotTrigger').then(module => ({ default: module.ChatbotTrigger })));
+const Chatbot = lazy(() => import('./components/Chatbot').then(module => ({ default: module.Chatbot })));
 
 
 const App: React.FC = () => {
@@ -19,6 +22,12 @@ const App: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loadingMessage, setLoadingMessage] = useState<string>('');
+
+  // Chatbot state
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const chatSession = useRef<Chat | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatbotLoading, setIsChatbotLoading] = useState(false);
 
   const loadingMessages = [
     "Connecting to the AI model...",
@@ -81,6 +90,38 @@ const App: React.FC = () => {
       if (interval) clearInterval(interval);
     };
   }, [isLoading]);
+  
+    // Effect to initialize or reset chat session based on report data
+  useEffect(() => {
+    if (reportData && !chatSession.current) {
+      chatSession.current = createChatSession();
+      setChatMessages([
+        { role: 'model', text: `Hi! I'm your AI assistant. How can I help you with the audit report for ${url}?` }
+      ]);
+    } else if (!reportData) {
+        chatSession.current = null;
+        setChatMessages([]);
+        setIsChatbotOpen(false); // Close chatbot if a new audit starts
+    }
+  }, [reportData, url]);
+  
+  const handleSendMessage = useCallback(async (message: string) => {
+    if (!chatSession.current) return;
+
+    setChatMessages(prev => [...prev, { role: 'user', text: message }]);
+    setIsChatbotLoading(true);
+
+    try {
+        const response = await chatSession.current.sendMessage({ message });
+        const text = response.text;
+        setChatMessages(prev => [...prev, { role: 'model', text }]);
+    } catch (e) {
+        console.error("Chatbot error:", e);
+        setChatMessages(prev => [...prev, { role: 'model', text: "Sorry, I encountered an error. Please try again." }]);
+    } finally {
+        setIsChatbotLoading(false);
+    }
+  }, []);
 
   const handlePrint = useCallback(async () => {
     const reportElement = document.getElementById('report-content');
@@ -194,15 +235,25 @@ const App: React.FC = () => {
           </div>
         }>
           {reportData && !isLoading && (
-            <div id="report-content" className="mt-8 animate-fade-in print-container">
-              <Report data={reportData} url={url} onPrint={handlePrint} isPrinting={isPrinting} />
-              <PitchGenerator 
-                onGenerate={handleGeneratePitch} 
-                pitches={pitches} 
-                isLoading={isPitchLoading}
+            <>
+              <div id="report-content" className="mt-8 animate-fade-in print-container">
+                <Report data={reportData} url={url} onPrint={handlePrint} isPrinting={isPrinting} />
+                <PitchGenerator 
+                  onGenerate={handleGeneratePitch} 
+                  pitches={pitches} 
+                  isLoading={isPitchLoading}
+                />
+                <CallNotes url={url} />
+              </div>
+              <ChatbotTrigger onClick={() => setIsChatbotOpen(true)} />
+              <Chatbot
+                isOpen={isChatbotOpen}
+                onClose={() => setIsChatbotOpen(false)}
+                messages={chatMessages}
+                onSendMessage={handleSendMessage}
+                isLoading={isChatbotLoading}
               />
-              <CallNotes url={url} />
-            </div>
+            </>
           )}
         </Suspense>
       </main>

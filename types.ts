@@ -1,3 +1,4 @@
+
 export interface AuditSection {
   score: number;
   comment: string;
@@ -33,4 +34,9 @@ export interface AuditReportData {
   summary: string;
   advertisingOptimization: AnalysisSection;
   googleMyBusiness: AnalysisSection;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
 }

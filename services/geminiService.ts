@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { AuditReportData } from './types';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -22,7 +22,7 @@ const auditSchema = {
     },
     seo: {
       ...auditSectionSchema,
-      description: "Analysis of on-page SEO factors like title/meta tags, H1-H6 structure, alt-tags, and internal linking. Highlights potential for technical SEO and keyword optimization services."
+      description: "Analysis of on-page SEO factors like title/meta tags, H1-H6 structure, alt-tags, internal linking, and schema markup. Highlights potential for technical SEO and keyword optimization services."
     },
     digitalMarketingPresence: {
       type: Type.OBJECT,
@@ -120,7 +120,11 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
         - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around Outsource.dk's ability to build a high-converting website.
 
     2.  **SEO (Søgemaskineoptimering):**
-        - Analyze on-page and technical SEO basics. Frame comment to highlight missed opportunities for organic traffic.
+        - Analyze on-page and technical SEO. Your analysis must go beyond basics and include these advanced topics:
+        - **Schema Markup:** Check for structured data (e.g., \`Organization\`, \`LocalBusiness\`, \`Product\`, \`FAQPage\` schema). Comment on its presence and correct implementation. If missing, identify it as a major opportunity for rich snippets in search results.
+        - **Internal Linking:** Evaluate the internal linking strategy. Are key pages well-linked together to show their relationship? Is anchor text descriptive and relevant? Is there a clear, logical link flow, or are there important pages with very few internal links (orphaned pages)?
+        - **Core On-Page Factors:** Also include analysis of title/meta tags, H1-H6 structure, and image alt-tags.
+        - Frame the final comment to highlight missed opportunities for organic traffic and improved search visibility.
 
     3.  **Digital Marketing Tilstedeværelse (Digital Marketing Presence):**
         - Look for social media links (Facebook, Instagram, LinkedIn, X, TikTok, etc.). For each platform found, find and list the number of followers (use 'Ukendt' if not found).
@@ -227,4 +231,19 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     console.error("Failed to parse JSON response for pitches:", jsonText);
     throw new Error("The AI returned an invalid JSON format for the sales pitch.");
   }
+};
+
+export const createChatSession = (): Chat => {
+    const systemInstruction = `You are a friendly, expert AI assistant for Outsource.dk, a digital marketing agency. Your goal is to help users of the Website Audit AI tool.
+    You are knowledgeable about all sections of the audit report: Hjemmeside & UX, SEO, Digital Marketing, Indhold & Kommunikation, AI & Automation, Annoncering & Optimering, and Google My Business.
+    You can also answer questions about Outsource.dk's services, which include: Websites, Social Media management, Google Ads, SEO, E-mail marketing, AI Chatbots, and AI Workflows.
+    Keep your answers concise and easy to understand. Be professional and encouraging. If you don't know an answer, politely say so. Do not make up information.
+    The user is likely a salesperson or meeting booker. Frame your answers to be helpful for their role.`;
+
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
+        config: {
+            systemInstruction,
+        },
+    });
 };

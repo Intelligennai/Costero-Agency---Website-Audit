@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon } from './Icons';
+import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon, ClipboardIcon } from './Icons';
 
 interface CallNotesProps {
   url: string;
@@ -9,6 +9,7 @@ interface CallNotesProps {
 const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   const [notes, setNotes] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [isCopied, setIsCopied] = useState(false);
   const isInitialMount = useRef(true);
 
   const storageKey = `call_notes_${url}`;
@@ -60,6 +61,13 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
       }
     }
   }, [storageKey]);
+
+  const handleCopy = useCallback(() => {
+    if (!notes || isCopied) return;
+    navigator.clipboard.writeText(notes);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  }, [notes, isCopied]);
   
   const getSaveStatusIndicator = () => {
     switch (saveStatus) {
@@ -111,7 +119,25 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         className="w-full h-48 p-3 bg-brand-primary border-2 border-brand-accent rounded-md text-brand-text placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
         aria-label="Call Notes"
       />
-      <div className="flex items-center justify-end mt-4">
+      <div className="flex items-center justify-end mt-4 gap-2">
+         <button
+          onClick={handleCopy}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-light rounded-md hover:bg-brand-accent hover:text-brand-text transition-colors disabled:opacity-50"
+          disabled={!notes || isCopied}
+          title="Copy notes to clipboard"
+        >
+          {isCopied ? (
+            <>
+              <CheckIcon className="w-4 h-4 text-brand-green" />
+              <span>Copied!</span>
+            </>
+          ) : (
+            <>
+              <ClipboardIcon className="w-4 h-4" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
         <button
           onClick={handleClear}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-brand-light rounded-md hover:bg-brand-red hover:text-brand-text transition-colors disabled:opacity-50"
