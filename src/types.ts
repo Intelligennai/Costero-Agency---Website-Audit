@@ -36,6 +36,13 @@ export interface AuditReportData {
   googleMyBusiness: AnalysisSection;
 }
 
+export interface PdfExportOptions {
+  selectedSections: string[];
+  headerText: string;
+  footerText: string;
+  logo: string | null; // base64 encoded image
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;

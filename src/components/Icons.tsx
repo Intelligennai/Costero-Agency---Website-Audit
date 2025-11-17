@@ -215,43 +215,6 @@ const TrashIconComponent: React.FC<IconProps> = (props) => (
 );
 export const TrashIcon = React.memo(TrashIconComponent);
 
-const UserIconComponent: React.FC<IconProps> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-);
-export const UserIcon = React.memo(UserIconComponent);
-
-// FIX: Added missing LockIcon for use in the login form.
-const LockIconComponent: React.FC<IconProps> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-);
-export const LockIcon = React.memo(LockIconComponent);
-
-const SunIconComponent: React.FC<IconProps> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-);
-export const SunIcon = React.memo(SunIconComponent);
-
-const MoonIconComponent: React.FC<IconProps> = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-);
-export const MoonIcon = React.memo(MoonIconComponent);
-
-const ChatIconComponent: React.FC<IconProps> = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-);
-export const ChatIcon = React.memo(ChatIconComponent);
-
 const CloseIconComponent: React.FC<IconProps> = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"/>
@@ -260,17 +223,61 @@ const CloseIconComponent: React.FC<IconProps> = (props) => (
 );
 export const CloseIcon = React.memo(CloseIconComponent);
 
+const CogIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m17 20.66-1-1.73"/><path d="m8 4.08-1 1.73"/><path d="m20.66 17-1.73-1"/><path d="m4.08 8-1.73-1"/><path d="M2 12h2"/><path d="M22 12h-2"/><path d="m17 3.34 1 1.73"/><path d="m8 19.92 1-1.73"/><path d="m3.34 7 1.73 1"/><path d="m19.92 16 1.73 1"/>
+    </svg>
+);
+export const CogIcon = React.memo(CogIconComponent);
+
+const UserIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+);
+export const UserIcon = React.memo(UserIconComponent);
+
 const SendIconComponent: React.FC<IconProps> = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"/>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
     </svg>
 );
 export const SendIcon = React.memo(SendIconComponent);
 
 const BotIconComponent: React.FC<IconProps> = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 8V4H8"/><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 4.56a8 8 0 1 0 0 14.88"/>
+        <path d="M12 8V4H8"/><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 18H9"/><path d="M10 14h4"/><circle cx="8.5" cy="11.5" r=".5" fill="currentColor"/><circle cx="15.5" cy="11.5" r=".5" fill="currentColor"/>
     </svg>
 );
 export const BotIcon = React.memo(BotIconComponent);
+
+const ChatIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+);
+export const ChatIcon = React.memo(ChatIconComponent);
+{/* FIX: Add LockIcon for Login.tsx */}
+const LockIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+);
+export const LockIcon = React.memo(LockIconComponent);
+
+{/* FIX: Add SunIcon for ThemeToggle.tsx */}
+const SunIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+);
+export const SunIcon = React.memo(SunIconComponent);
+
+{/* FIX: Add MoonIcon for ThemeToggle.tsx */}
+const MoonIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+);
+export const MoonIcon = React.memo(MoonIconComponent);

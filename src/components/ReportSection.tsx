@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import type { SocialMediaStat, ReviewStats } from '../types';
 import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon, YouTubeIcon, PinterestIcon, RedditIcon, TrustpilotIcon, GoogleIcon } from './Icons';
@@ -13,6 +12,7 @@ interface ReportSectionProps {
   socialMediaStats?: SocialMediaStat[];
   trustpilot?: ReviewStats;
   googleReviews?: ReviewStats;
+  sectionId?: string;
 }
 
 const getScoreColor = (score: number) => {
@@ -34,31 +34,31 @@ const SocialIcon: React.FC<{ platform: string; className?: string }> = ({ platfo
     return null;
 };
 
-const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats, trustpilot, googleReviews }) => {
+const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats, trustpilot, googleReviews, sectionId }) => {
   const scoreColor = score !== undefined ? getScoreColor(score) : '';
   const hasReputationData = trustpilot || googleReviews;
 
   return (
-    <div className={`bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
+    <div data-section-id={sectionId} className={`bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <span className="text-brand-cyan" title={title}>{icon}</span>
-          <h4 className="text-xl font-bold text-gray-700 dark:text-brand-light">{title}</h4>
+          <h4 className="text-xl font-bold text-brand-light">{title}</h4>
         </div>
         {score !== undefined && (
           <div className={`text-3xl font-bold ${scoreColor}`}>{score}<span className="text-lg">/100</span></div>
         )}
       </div>
-      <p className="text-gray-800 dark:text-brand-text flex-grow whitespace-pre-wrap">{comment}</p>
+      <p className="text-brand-text flex-grow whitespace-pre-wrap">{comment}</p>
       
       {socialMediaStats && socialMediaStats.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
-          <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">Social Media Følgere</h5>
+        <div className="mt-4 pt-4 border-t border-brand-accent/30">
+          <h5 className="text-sm font-bold text-brand-light mb-2">Social Media Følgere</h5>
           <ul className="space-y-2">
             {socialMediaStats.map((stat, index) => (
-              <li key={index} className="flex items-center justify-between text-gray-800 dark:text-brand-text">
+              <li key={index} className="flex items-center justify-between text-brand-text">
                 <span className="flex items-center gap-2 capitalize">
-                  <SocialIcon platform={stat.platform} className="w-5 h-5 text-gray-500 dark:text-brand-light" />
+                  <SocialIcon platform={stat.platform} className="w-5 h-5 text-brand-light" />
                   {stat.platform}
                 </span>
                 <span className="font-semibold text-brand-cyan">{stat.followers}</span>
@@ -69,30 +69,30 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
       )}
 
       {hasReputationData && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
-            <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">Online Omdømme</h5>
+        <div className="mt-4 pt-4 border-t border-brand-accent/30">
+            <h5 className="text-sm font-bold text-brand-light mb-2">Online Omdømme</h5>
             <ul className="space-y-2">
                 {googleReviews && (
-                    <li className="flex items-center justify-between text-gray-800 dark:text-brand-text">
+                    <li className="flex items-center justify-between text-brand-text">
                         <span className="flex items-center gap-2">
-                            <GoogleIcon className="w-5 h-5 text-gray-500 dark:text-brand-light" />
+                            <GoogleIcon className="w-5 h-5 text-brand-light" />
                             Google Reviews
                         </span>
                         <div className="text-right">
                             <p className="font-semibold text-brand-yellow">{googleReviews.score}</p>
-                            <p className="text-xs text-gray-500 dark:text-brand-light">{googleReviews.reviewCount}</p>
+                            <p className="text-xs text-brand-light">{googleReviews.reviewCount}</p>
                         </div>
                     </li>
                 )}
                 {trustpilot && (
-                    <li className="flex items-center justify-between text-gray-800 dark:text-brand-text">
+                    <li className="flex items-center justify-between text-brand-text">
                         <span className="flex items-center gap-2">
                             <TrustpilotIcon className="w-5 h-5 text-brand-green" />
                             Trustpilot
                         </span>
                          <div className="text-right">
                             <p className="font-semibold text-brand-yellow">{trustpilot.score}</p>
-                            <p className="text-xs text-gray-500 dark:text-brand-light">{trustpilot.reviewCount}</p>
+                            <p className="text-xs text-brand-light">{trustpilot.reviewCount}</p>
                         </div>
                     </li>
                 )}

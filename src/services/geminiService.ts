@@ -4,21 +4,6 @@ import type { AuditReportData } from '../types';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-// Custom error classes for more specific feedback
-class ApiError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
-
-class InvalidResponseError extends ApiError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'InvalidResponseError';
-  }
-}
-
 const auditSectionSchema = {
   type: Type.OBJECT,
   properties: {
@@ -37,7 +22,7 @@ const auditSchema = {
     },
     seo: {
       ...auditSectionSchema,
-      description: "Analysis of on-page SEO factors like title/meta tags, H1-H6 structure, alt-tags, and internal linking. Highlights potential for technical SEO and keyword optimization services."
+      description: "Analysis of on-page SEO factors like title/meta tags, H1-H6 structure, alt-tags, internal linking, and schema markup. Highlights potential for technical SEO and keyword optimization services."
     },
     digitalMarketingPresence: {
       type: Type.OBJECT,
@@ -135,7 +120,11 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
         - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around Outsource.dk's ability to build a high-converting website.
 
     2.  **SEO (Søgemaskineoptimering):**
-        - Analyze on-page and technical SEO basics. Frame comment to highlight missed opportunities for organic traffic.
+        - Analyze on-page and technical SEO. Your analysis must go beyond basics and include these advanced topics:
+        - **Schema Markup:** Check for structured data (e.g., \`Organization\`, \`LocalBusiness\`, \`Product\`, \`FAQPage\` schema). Comment on its presence and correct implementation. If missing, identify it as a major opportunity for rich snippets in search results.
+        - **Internal Linking:** Evaluate the internal linking strategy. Are key pages well-linked together to show their relationship? Is anchor text descriptive and relevant? Is there a clear, logical link flow, or are there important pages with very few internal links (orphaned pages)?
+        - **Core On-Page Factors:** Also include analysis of title/meta tags, H1-H6 structure, and image alt-tags.
+        - Frame the final comment to highlight missed opportunities for organic traffic and improved search visibility.
 
     3.  **Digital Marketing Tilstedeværelse (Digital Marketing Presence):**
         - Look for social media links (Facebook, Instagram, LinkedIn, X, TikTok, etc.). For each platform found, find and list the number of followers (use 'Ukendt' if not found).
@@ -172,41 +161,21 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: auditSchema,
-        },
-      });
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: auditSchema,
+    },
+  });
 
-      const jsonText = response.text.trim();
-      try {
-        return JSON.parse(jsonText) as AuditReportData;
-      } catch (e) {
-        console.error("Failed to parse JSON response:", jsonText);
-        throw new InvalidResponseError("The AI returned an invalid data format. The report could not be displayed.");
-      }
-  } catch (error) {
-      console.error("Error calling Gemini API for audit report:", error);
-      if (error instanceof Error) {
-            if (error.message.includes('429')) {
-              throw new ApiError('Too many requests sent in a short period. Please wait a moment before trying again.');
-            }
-            if (error.message.includes('500') || error.message.includes('503')) {
-                throw new ApiError('The AI service is currently experiencing issues or is overloaded. Please try again later.');
-            }
-            if (error.message.toLowerCase().includes('safety')) {
-                throw new ApiError('The request was blocked due to safety settings, which can sometimes happen with certain URLs. Please try a different website.');
-            }
-            if (error.message.includes('400')) {
-                throw new ApiError('There was a problem with the request sent to the AI (Bad Request). Please check the URL and try again.');
-            }
-      }
-      // Generic catch-all
-      throw new ApiError('Failed to generate the audit report due to an unknown API error. Please try again.');
+  const jsonText = response.text.trim();
+  try {
+    return JSON.parse(jsonText) as AuditReportData;
+  } catch (e) {
+    console.error("Failed to parse JSON response:", jsonText);
+    throw new Error("The AI returned an invalid JSON format.");
   }
 };
 
@@ -245,41 +214,22 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: pitchSchema,
-        },
-      });
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: pitchSchema,
+    },
+  });
 
-      const jsonText = response.text.trim();
-      try {
-        const parsed = JSON.parse(jsonText);
-        return parsed.pitches as string[];
-      } catch (e) {
-        console.error("Failed to parse JSON response for pitches:", jsonText);
-        throw new InvalidResponseError("The AI returned an invalid data format for the sales pitch.");
-      }
-  } catch (error) {
-      console.error("Error calling Gemini API for sales pitch:", error);
-      if (error instanceof Error) {
-          if (error.message.includes('429')) {
-              throw new ApiError('Too many requests sent in a short period. Please wait a moment before trying again.');
-          }
-          if (error.message.includes('500') || error.message.includes('503')) {
-              throw new ApiError('The AI service is currently experiencing issues or is overloaded. Please try again later.');
-          }
-          if (error.message.toLowerCase().includes('safety')) {
-              throw new ApiError('The pitch generation was blocked due to safety settings.');
-          }
-           if (error.message.includes('400')) {
-                throw new ApiError('There was a problem with the request sent to the AI for pitch generation (Bad Request).');
-            }
-      }
-      throw new ApiError('Failed to generate sales pitch due to an unknown API error.');
+  const jsonText = response.text.trim();
+  try {
+    const parsed = JSON.parse(jsonText);
+    return parsed.pitches as string[];
+  } catch (e) {
+    console.error("Failed to parse JSON response for pitches:", jsonText);
+    throw new Error("The AI returned an invalid JSON format for the sales pitch.");
   }
 };
 
