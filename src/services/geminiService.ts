@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { AuditReportData } from '../types';
 
 // Custom error classes for more specific feedback
@@ -16,6 +16,45 @@ class InvalidResponseError extends ApiError {
     this.name = 'InvalidResponseError';
   }
 }
+
+// Custom error classes for the simulated login process
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+export class InvalidCredentialsError extends AuthError {
+  constructor() {
+    super('Invalid password. Please try again.');
+    this.name = 'InvalidCredentialsError';
+  }
+}
+export class NetworkError extends AuthError {
+  constructor() {
+    super('A network error occurred. Please check your connection and try again.');
+    this.name = 'NetworkError';
+  }
+}
+export class ServerError extends AuthError {
+  constructor() {
+    super('The authentication service is currently unavailable. Please try again later.');
+    this.name = 'ServerError';
+  }
+}
+export class EmailExistsError extends AuthError {
+    constructor() {
+        super('An account with this email already exists. Please log in.');
+        this.name = 'EmailExistsError';
+    }
+}
+export class WeakPasswordError extends AuthError {
+    constructor() {
+        super('Password must be at least 8 characters long.');
+        this.name = 'WeakPasswordError';
+    }
+}
+
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -279,4 +318,19 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
       }
       throw new ApiError('Failed to generate sales pitch due to an unknown API error.');
   }
+};
+
+export const createChatSession = (): Chat => {
+    const systemInstruction = `You are a friendly, expert AI assistant for Outsource.dk, a digital marketing agency. Your goal is to help users of the Website Audit AI tool.
+    You are knowledgeable about all sections of the audit report: Hjemmeside & UX, SEO, Digital Marketing, Indhold & Kommunikation, AI & Automation, Annoncering & Optimering, and Google My Business.
+    You can also answer questions about Outsource.dk's services, which include: Websites, Social Media management, Google Ads, SEO, E-mail marketing, AI Chatbots, and AI Workflows.
+    Keep your answers concise and easy to understand. Be professional and encouraging. If you don't know an answer, politely say so. Do not make up information.
+    The user is likely a salesperson or meeting booker. Frame your answers to be helpful for their role.`;
+
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
+        config: {
+            systemInstruction,
+        },
+    });
 };
