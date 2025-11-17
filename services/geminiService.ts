@@ -162,7 +162,8 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    // FIX: Upgraded model to gemini-2.5-pro for better analysis of complex tasks.
+    model: 'gemini-2.5-pro',
     contents: prompt,
     config: {
       responseMimeType: 'application/json',
@@ -215,7 +216,8 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    // FIX: Upgraded model to gemini-2.5-pro for higher quality pitch generation.
+    model: 'gemini-2.5-pro',
     contents: prompt,
     config: {
       responseMimeType: 'application/json',

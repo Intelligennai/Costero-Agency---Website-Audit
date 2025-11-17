@@ -113,7 +113,8 @@ const App: React.FC = () => {
     setIsChatbotLoading(true);
 
     try {
-        const response = await chatSession.current.sendMessage({ message });
+        // FIX: The `sendMessage` method expects a string, not an object.
+        const response = await chatSession.current.sendMessage(message);
         const text = response.text;
         setChatMessages(prev => [...prev, { role: 'model', text }]);
     } catch (e) {
