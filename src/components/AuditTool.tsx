@@ -7,7 +7,7 @@ import { useAuthContext } from '../hooks/useAuth';
 import { useTranslations } from '../hooks/useTranslations';
 import { LanguageContext } from '../context/LanguageContext';
 import type { TranslationKey } from '../translations';
-import AuditForm from './AuditForm';
+import AuditForm from '../components/AuditForm';
 
 // Lazy load components
 const Report = lazy(() => import('./Report').then(module => ({ default: module.Report })));
