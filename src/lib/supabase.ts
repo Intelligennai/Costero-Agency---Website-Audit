@@ -1,11 +1,25 @@
 
-import { createClient } from '@supabase/supabase-js';
+// This file is now a mock to allow the app to run without Supabase credentials.
+// The actual data management has been moved to local storage in useAuth.ts.
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Missing Supabase environment variables");
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+    signInWithPassword: async () => ({ data: {}, error: null }),
+    signUp: async () => ({ data: {}, error: null }),
+    signOut: async () => ({ error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+  },
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: async () => ({ data: null, error: null }),
+        order: () => ({ data: [], error: null }),
+      }),
+      insert: async () => ({ data: null, error: null }),
+      update: () => ({ eq: async () => ({ error: null }) }),
+      delete: () => ({ eq: async () => ({ error: null }) }),
+    }),
+  }),
+};
