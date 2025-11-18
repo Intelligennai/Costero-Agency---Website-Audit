@@ -1,24 +1,7 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
-import type { AuditReportData } from '../types';
+import type { AuditReportData, AgencyProfile } from '../types';
 
-// Singleton instance, initialized lazily
-let ai: GoogleGenAI | null = null;
-
-/**
- * Initializes and returns the GoogleGenAI client instance.
- * Throws a specific, user-friendly error if the API key is missing.
- */
-const getAiClient = (): GoogleGenAI => {
-    if (!process.env.API_KEY) {
-        // This error message is designed to be displayed directly in the UI.
-        throw new Error("API Key is missing. Please ensure the VITE_API_KEY environment variable is set in your deployment environment (e.g., Vercel project settings).");
-    }
-    if (!ai) {
-        ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    }
-    return ai;
-};
-
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const auditSectionSchema = {
   type: Type.OBJECT,
@@ -84,7 +67,7 @@ const auditSchema = {
     },
     aiAutomation: {
       ...auditSectionSchema,
-      description: "Analysis of existing AI tools like chatbots and potential for new AI workflows, lead nurturing, or customer service automation. Identifies opportunities for Outsource.dk to implement custom AI solutions."
+      description: "Analysis of existing AI tools like chatbots and potential for new AI workflows, lead nurturing, or customer service automation. Identifies opportunities for the agency to implement custom AI solutions."
     },
     overallPotential: {
       ...auditSectionSchema,
@@ -93,7 +76,7 @@ const auditSchema = {
     advertisingOptimization: {
       type: Type.OBJECT,
       properties: {
-        comment: { type: Type.STRING, description: "A detailed analysis of current Google/Meta advertising. MUST start with a summary of current ad performance, then provide 3-4 specific, actionable recommendations as bullet points for how Outsource.dk can achieve better results." }
+        comment: { type: Type.STRING, description: "A detailed analysis of current Google/Meta advertising. MUST start with a summary of current ad performance, then provide 3-4 specific, actionable recommendations as bullet points for how the agency can achieve better results." }
       },
       required: ['comment'],
       description: "Analysis of current advertising efforts and suggestions for improvement."
@@ -108,7 +91,7 @@ const auditSchema = {
     },
     summary: {
       type: Type.STRING,
-      description: "A 2-3 sentence executive summary of the most critical digital marketing and AI findings, framed as opportunities for Outsource.dk."
+      description: "A 2-3 sentence executive summary of the most critical digital marketing and AI findings, framed as opportunities for the agency."
     }
   },
   required: [
@@ -124,17 +107,23 @@ const auditSchema = {
   ]
 };
 
-export const generateAuditReport = async (url: string): Promise<AuditReportData> => {
-  const aiClient = getAiClient();
-  const prompt = `
-    Act as a senior digital marketing and AI consultant for Outsource.dk, a digital agency whose services cover Hjemmesider (Websites), Sociale medier (Social Media), Google Ads, SEO, E-mail marketing, AI Chatbots, and AI Workflows.
-    Your task is to conduct a targeted audit of the website: ${url}.
-    Your analysis must identify specific pain points that align directly with Outsource.dk's services. The audience is a salesperson who needs clear, actionable insights to initiate a conversation.
+export const generateAuditReport = async (url: string, agencyProfile: AgencyProfile, language: string): Promise<AuditReportData> => {
+  const languageMap: { [key: string]: string } = {
+    da: 'DANISH',
+    en: 'ENGLISH',
+    es: 'SPANISH',
+  };
+  const targetLanguage = languageMap[language] || 'ENGLISH';
 
-    Evaluate the following categories. Provide a score from 0 to 100 for the first 5, and a concise, actionable comment IN DANISH for each category.
+  const prompt = `
+    Act as a senior digital marketing and AI consultant for ${agencyProfile.name}, a digital agency whose services cover ${agencyProfile.services.join(', ')}.
+    Your task is to conduct a targeted audit of the website: ${url}.
+    Your analysis must identify specific pain points that align directly with ${agencyProfile.name}'s services. The audience is a salesperson who needs clear, actionable insights to initiate a conversation.
+
+    Evaluate the following categories. Provide a score from 0 to 100 for the first 5, and a concise, actionable comment IN ${targetLanguage} for each category.
 
     1.  **Hjemmeside & Brugeroplevelse (Website & UX):**
-        - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around Outsource.dk's ability to build a high-converting website.
+        - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around ${agencyProfile.name}'s ability to build a high-converting website.
 
     2.  **SEO (Søgemaskineoptimering):**
         - Analyze on-page and technical SEO. Your analysis must go beyond basics and include these advanced topics:
@@ -153,33 +142,33 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
         - Evaluate copy, tone-of-voice, and value. Frame comment by connecting strong content to building trust and authority.
     
     5.  **AI & Automation:**
-        - Check for chatbots and automation potential in workflows. Frame comment to introduce Outsource.dk's ability to build intelligent solutions.
+        - Check for chatbots and automation potential in workflows. Frame comment to introduce ${agencyProfile.name}'s ability to build intelligent solutions, if that is one of their listed services.
 
     6.  **Annoncering & Optimering (Advertising & Optimization):**
         - This section should NOT have a score.
         - Scan for evidence of Google Ads (e.g., gclid parameters) and Meta Ads (Facebook Pixel).
-        - CRITICAL: To provide context, you MUST research and include **specific** industry benchmarks for a similar business in Denmark. For example, if the site is for a **SaaS company, find the average conversion rate for SaaS in Denmark. If it's e-commerce, find average e-commerce CTRs. If it's a local service business (like a plumber), find average Cost-Per-Lead.** This specific context is vital for a high-quality analysis.
+        - **Competitor Analysis:** You MUST attempt to find 1-2 key competitors in their industry and region. Briefly summarize their advertising strategy (e.g., what channels they seem to be using, what their key messaging is). Use this comparison to strengthen your recommendations.
+        - **Industry Benchmarks:** To provide context, you MUST research and include **specific** industry benchmarks for a similar business in their local region. For example, if it's a SaaS company, find the average conversion rate. If it's e-commerce, find average CTRs. If it's a local service, find average Cost-Per-Lead. This specific context is vital.
         - Based on your findings:
-          - If ad evidence is found, provide a concise summary of their current advertising strategy and compare their likely performance against the industry benchmarks you found.
-          - If no ad evidence is found, state that this is a major untapped opportunity, using the industry benchmarks to quantify what they are missing out on.
-        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their results. These should be specific and data-driven.
+          - If ad evidence is found, provide a concise summary of their current advertising strategy and compare their likely performance against both the competitor strategies and the industry benchmarks you found.
+          - If no ad evidence is found, state that this is a major untapped opportunity. Use the competitor activities and industry benchmarks to quantify what they are missing out on.
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how ${agencyProfile.name} can improve their results. These should be specific and data-driven, referencing the competitive landscape.
         - Frame this entire section as a major growth opportunity.
     
     7. **Google My Business Optimering:**
         - This section should NOT have a score.
         - Search for the company's Google Business Profile (GMB).
         - Analyze its completeness: review count & rating, response rate to reviews, photo quality and quantity, recent posts, and accuracy of business information (NAP).
-        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how Outsource.dk can improve their GMB listing for better local visibility.
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how ${agencyProfile.name} can improve their GMB listing for better local visibility.
         - Frame this as a critical component for local SEO and attracting nearby customers.
 
-    Finally, provide an "Overall Potential" score (0-100) indicating how likely this prospect is a good fit for Outsource.dk.
+    Finally, provide an "Overall Potential" score (0-100) indicating how likely this prospect is a good fit for ${agencyProfile.name}.
     Also, write a 2-3 sentence executive summary of the most critical findings.
 
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  const response = await aiClient.models.generateContent({
-    // FIX: Upgraded model to gemini-2.5-pro for better analysis of complex tasks.
+  const response = await ai.models.generateContent({
     model: 'gemini-2.5-pro',
     contents: prompt,
     config: {
@@ -193,7 +182,7 @@ export const generateAuditReport = async (url: string): Promise<AuditReportData>
     return JSON.parse(jsonText) as AuditReportData;
   } catch (e) {
     console.error("Failed to parse JSON response:", jsonText);
-    throw new Error("The AI returned an invalid JSON format.");
+    throw new Error("error_invalid_json");
   }
 };
 
@@ -212,11 +201,17 @@ const pitchSchema = {
   required: ['pitches']
 };
 
-export const generateSalesPitch = async (reportData: AuditReportData): Promise<string[]> => {
-  const aiClient = getAiClient();
+export const generateSalesPitch = async (reportData: AuditReportData, agencyProfile: AgencyProfile, language: string): Promise<string[]> => {
+  const languageMap: { [key: string]: string } = {
+    da: 'DANISH',
+    en: 'ENGLISH',
+    es: 'SPANISH',
+  };
+  const targetLanguage = languageMap[language] || 'ENGLISH';
+
   const prompt = `
-    Based on the following digital marketing audit report for a potential client, generate an array of 3 compelling and concise 30-second sales pitch variations in Danish.
-    The pitch is for a meeting booker from Outsource.dk. The goal is to secure a meeting.
+    Based on the following digital marketing audit report for a potential client, generate an array of 3 compelling and concise 30-second sales pitch variations in ${targetLanguage}.
+    The pitch is for a meeting booker from ${agencyProfile.name}. The goal is to secure a meeting.
     Each pitch should highlight a key pain point from the audit but from a different angle.
 
     - **Variation 1 (Data-Driven):** Focus heavily on the specific numbers and benchmarks from the 'advertisingOptimization' or 'googleMyBusiness' sections. Be direct and analytical.
@@ -233,8 +228,7 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
   `;
 
-  const response = await aiClient.models.generateContent({
-    // FIX: Upgraded model to gemini-2.5-pro for higher quality pitch generation.
+  const response = await ai.models.generateContent({
     model: 'gemini-2.5-pro',
     contents: prompt,
     config: {
@@ -249,36 +243,60 @@ export const generateSalesPitch = async (reportData: AuditReportData): Promise<s
     return parsed.pitches as string[];
   } catch (e) {
     console.error("Failed to parse JSON response for pitches:", jsonText);
-    throw new Error("The AI returned an invalid JSON format for the sales pitch.");
+    throw new Error("error_pitch_invalid_json");
   }
 };
 
-export const createChatSession = (): Chat => {
-    const aiClient = getAiClient();
-    const systemInstruction = `You are a friendly, expert AI assistant and sales coach for Outsource.dk, a digital marketing agency. Your primary goal is to help salespeople and meeting bookers understand the Website Audit AI report so they can effectively sell Outsource.dk's services.
-
-    Always frame your answers to be helpful for a salesperson. This means connecting problems to solutions and identifying sales opportunities.
-
-    You are an expert on all sections of the audit report and how they relate to Outsource.dk's services:
-    - **Hjemmeside & UX:** A low score here is a direct opportunity to sell our **Websites** service. Explain how a modern, user-friendly website can increase conversions.
-    - **SEO:** Poor SEO scores open the door for our **SEO** service. Emphasize how we can improve their organic visibility and drive more traffic than their competitors.
-    - **Digital Marketing Presence:** This section relates to our **Social Media management**, **Google Ads**, and **E-mail marketing** services. If they have a weak social media presence or poor online reviews, explain how we can build their brand and manage their reputation.
-    - **Indhold & Kommunikation:** Weak content is an opportunity to discuss content strategy, which is part of our **SEO** and **Social Media** services.
-    - **AI & Automation:** A low score here is a clear signal to pitch our **AI Chatbots** and **AI Workflows** services. Explain how automation can save them time and money, and how chatbots can capture more leads.
-    - **Annoncering & Optimering:** This directly relates to our **Google Ads** service. Use the benchmarks in the report to highlight how much potential revenue they're missing out on.
-    - **Google My Business:** This is a key part of our **SEO** service, especially for local businesses. Explain how an optimized GMB profile can attract local customers.
-
-    When answering questions:
-    1.  Be concise and direct.
-    2.  Explain the 'why' - why a particular finding in the report matters to the potential client's business.
-    3.  Proactively suggest how to position Outsource.dk's services as the solution. For example, say "This is a great talking point to introduce our AI Chatbot service because..."
-    4.  Maintain a professional, encouraging, and confident tone.
-    5.  If you don't know an answer, politely say so. Do not make up information.`;
-
-    return aiClient.chats.create({
-        model: 'gemini-flash-lite-latest',
+export const createChatSession = (systemInstruction: string): Chat => {
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
         config: {
             systemInstruction,
         },
     });
+};
+
+const agencyProfileSchema = {
+    type: Type.OBJECT,
+    properties: {
+        name: { type: Type.STRING, description: "The official name of the company or agency from the website." },
+        services: {
+            type: Type.ARRAY,
+            description: "A list of specific digital marketing services offered by the agency.",
+            items: {
+                type: Type.STRING,
+                description: "A single service (e.g., 'SEO', 'Web Design', 'Social Media Marketing')."
+            }
+        }
+    },
+    required: ['name', 'services']
+};
+
+export const analyzeAgencyWebsite = async (url: string): Promise<AgencyProfile> => {
+    const prompt = `
+        Analyze the content of the website at this URL: ${url}.
+        Your goal is to identify the company's name and the specific digital marketing services it provides.
+        
+        1.  **Company Name:** Find the official name of the company. It's usually in the header, footer, or 'About Us' page.
+        2.  **Services:** Scan the entire website, especially pages like 'Services', 'What We Do', or the homepage, to find a list of their offerings. Focus only on digital marketing services. Examples include: "SEO", "Web Design", "Google Ads", "Social Media Management", "Content Marketing", "PPC", "Email Marketing", "AI Chatbots". Be as specific as possible based on the text. If they just say "Marketing", try to find more details.
+
+        Return the result as a single JSON object. Do not include any markdown formatting.
+    `;
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+            responseMimeType: 'application/json',
+            responseSchema: agencyProfileSchema,
+        },
+    });
+
+    const jsonText = response.text.trim();
+    try {
+        return JSON.parse(jsonText) as AgencyProfile;
+    } catch (e) {
+        console.error("Failed to parse JSON response for agency profile:", jsonText);
+        throw new Error("error_agency_invalid_json");
+    }
 };

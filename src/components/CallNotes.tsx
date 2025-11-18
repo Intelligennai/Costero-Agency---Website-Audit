@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon, ClipboardIcon } from './Icons';
+import { useTranslations } from '../hooks/useTranslations';
 
 interface CallNotesProps {
   url: string;
@@ -11,6 +11,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isCopied, setIsCopied] = useState(false);
   const isInitialMount = useRef(true);
+  const t = useTranslations();
 
   const storageKey = `call_notes_${url}`;
 
@@ -23,7 +24,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
       console.error("Failed to read from localStorage", error);
       setNotes('');
     }
-    // Set initial state after loading
+    // Reset state for the new URL
     isInitialMount.current = true;
     setSaveStatus('idle');
   }, [storageKey]);
@@ -51,7 +52,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   }, [notes, storageKey]);
 
   const handleClear = useCallback(() => {
-    if (window.confirm('Are you sure you want to delete all notes for this URL? This cannot be undone.')) {
+    if (window.confirm(t('call_notes_clear_confirm'))) {
       try {
         localStorage.removeItem(storageKey);
         setNotes('');
@@ -60,7 +61,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         console.error("Failed to clear from localStorage", error);
       }
     }
-  }, [storageKey]);
+  }, [storageKey, t]);
 
   const handleCopy = useCallback(() => {
     if (!notes || isCopied) return;
@@ -75,22 +76,23 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
         return (
           <span className="text-gray-500 dark:text-brand-light flex items-center gap-2 text-sm animate-fade-in">
             <LoaderIcon className="w-4 h-4 animate-spin" />
-            Saving...
+            {t('call_notes_saving')}
           </span>
         );
       case 'saved':
         return (
           <span className="text-brand-green flex items-center gap-2 text-sm animate-fade-in">
             <CheckIcon className="w-4 h-4" />
-            Saved!
+            {t('call_notes_saved')}
           </span>
         );
       case 'idle':
+        // Show "All changes saved" only if it's not the initial load and there's content
         if (!isInitialMount.current && notes.length > 0) {
             return (
                 <span className="text-gray-400 dark:text-brand-light/70 flex items-center gap-2 text-sm">
                     <CheckIcon className="w-4 h-4" />
-                    All changes saved
+                    {t('call_notes_all_changes_saved')}
                 </span>
             );
         }
@@ -101,11 +103,11 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
   };
 
   return (
-    <div className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
+    <div data-section-id="callNotes" className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '300ms' }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold text-gray-700 dark:text-brand-light flex items-center gap-2">
           <NotesIcon className="w-6 h-6 text-brand-cyan" />
-          Call Notes
+          {t('call_notes_title')}
         </h3>
         <div className="flex items-center justify-end h-6 min-w-[120px] text-right">
             {getSaveStatusIndicator()}
@@ -115,7 +117,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        placeholder="Type your notes here... they will be saved automatically for this specific URL."
+        placeholder={t('call_notes_placeholder')}
         className="w-full h-48 p-3 bg-white dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-md text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
         aria-label="Call Notes"
       />
@@ -124,17 +126,17 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
           onClick={handleCopy}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 dark:text-brand-light rounded-md hover:bg-gray-200 dark:hover:bg-brand-accent hover:text-gray-900 dark:hover:text-brand-text transition-colors disabled:opacity-50"
           disabled={!notes || isCopied}
-          title="Copy notes to clipboard"
+          title={t('copy_tooltip')}
         >
           {isCopied ? (
             <>
               <CheckIcon className="w-4 h-4 text-brand-green" />
-              <span>Copied!</span>
+              <span>{t('copied')}</span>
             </>
           ) : (
             <>
               <ClipboardIcon className="w-4 h-4" />
-              <span>Copy</span>
+              <span>{t('copy')}</span>
             </>
           )}
         </button>
@@ -142,10 +144,10 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
           onClick={handleClear}
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 dark:text-brand-light rounded-md hover:bg-brand-red hover:text-white dark:hover:text-brand-text transition-colors disabled:opacity-50"
           disabled={notes.length === 0}
-          title="Clear all notes for this URL"
+          title={t('call_notes_clear_tooltip')}
         >
           <TrashIcon className="w-4 h-4" />
-          Clear
+          {t('call_notes_clear')}
         </button>
       </div>
     </div>

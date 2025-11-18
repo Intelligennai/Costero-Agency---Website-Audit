@@ -1,337 +1,37 @@
+import React, { Suspense, lazy } from 'react';
+import { useAuth } from './hooks/useAuth';
+import { useTheme } from './hooks/useTheme';
+import { LoaderIcon } from './components/Icons';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { AuditForm } from './components/AuditForm';
-import { generateAuditReport, generateSalesPitch, createChatSession } from './services/geminiService';
-import type { AuditReportData, PdfExportOptions, ChatMessage } from './types';
-import { GithubIcon, LoaderIcon, ServerCrashIcon } from './components/Icons';
-import type { Chat } from '@google/genai';
-import ThemeToggle from './components/ThemeToggle';
-import { Login } from './components/Login';
-import ReportSkeleton from './components/ReportSkeleton';
-import { Report } from './components/Report';
-import { PitchGenerator } from './components/PitchGenerator';
-import { CallNotes } from './components/CallNotes';
-import { PdfExportModal } from './components/PdfExportModal';
-import { ChatbotTrigger } from './components/ChatbotTrigger';
-import { Chatbot } from './components/Chatbot';
+const Login = lazy(() => import('./components/Login').then(module => ({ default: module.Login })));
+const AgencySetup = lazy(() => import('./components/AgencySetup').then(module => ({ default: module.default })));
+const AuditTool = lazy(() => import('./components/AuditTool').then(module => ({ default: module.AuditTool })));
 
+const FullScreenLoader: React.FC<{ message?: string }> = ({ message }) => (
+  <div className="min-h-screen bg-white dark:bg-brand-primary font-sans flex flex-col items-center justify-center text-center p-4">
+    <LoaderIcon className="w-16 h-16 animate-spin text-brand-cyan" />
+    {message && <p className="mt-4 text-xl font-semibold text-gray-700 dark:text-brand-text">{message}</p>}
+  </div>
+);
 
 const App: React.FC = () => {
-  const [url, setUrl] = useState<string>('');
-  const [reportData, setReportData] = useState<AuditReportData | null>(null);
-  const [pitches, setPitches] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isPitchLoading, setIsPitchLoading] = useState<boolean>(false);
-  const [isPrinting, setIsPrinting] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const storedTheme = window.localStorage.getItem('theme');
-      if (storedTheme === 'light' || storedTheme === 'dark') {
-        return storedTheme;
-      }
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
-    }
-    return 'light';
-  });
+  useTheme(); // Initialize and manage theme
+  const { user, isLoading } = useAuth();
 
-  // Chatbot state
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const chatSession = useRef<Chat | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isChatbotLoading, setIsChatbotLoading] = useState(false);
-
-   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove(theme === 'dark' ? 'light' : 'dark');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
-
-  const handleLogin = (password: string) => {
-      setIsAuthLoading(true);
-      // This is a placeholder for actual authentication.
-      // In a real app, you would verify this against a backend service.
-      setTimeout(() => {
-          if (password === 'outsource') {
-              setIsAuthenticated(true);
-              setAuthError('');
-          } else {
-              setAuthError('Incorrect password. Please try again.');
-          }
-          setIsAuthLoading(false);
-      }, 500);
-  };
-  
-  const handleRegister = (email: string, password: string) => {
-      setIsAuthLoading(true);
-      // Placeholder for registration logic
-      setTimeout(() => {
-          console.log("Registering with:", email, password);
-          setAuthError('Registration is not yet implemented.');
-          setIsAuthLoading(false);
-      }, 500);
-  };
-
-  const handleAudit = useCallback(async (domain: string) => {
-    if (!domain) {
-      setError('Please enter a website URL.');
-      return;
-    }
-    setIsLoading(true);
-    setError('');
-    setReportData(null);
-    setPitches([]);
-    setUrl(domain);
-    // Reset chatbot when a new audit starts
-    setIsChatbotOpen(false); 
-    chatSession.current = null;
-    setChatMessages([]);
-
-    try {
-      const data = await generateAuditReport(domain);
-      setReportData(data);
-    } catch (e: any) {
-      console.error(e);
-      setError(e.message || 'Failed to generate audit report. The AI model may be overloaded. Please try again in a moment.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-  
-  const handleGeneratePitch = useCallback(async () => {
-    if (!reportData) return;
-    setIsPitchLoading(true);
-    // No need to clear pitches, we can just show a loader over the old ones
-    // setPitches([]);
-    try {
-      const generatedPitches = await generateSalesPitch(reportData);
-      setPitches(generatedPitches);
-    } catch (e: any)      {
-      console.error(e);
-      setError(e.message || 'Failed to generate sales pitch. Please try again.');
-    } finally {
-      setIsPitchLoading(false);
-    }
-  }, [reportData]);
-
-  // Effect to initialize or reset chat session based on report data
-  useEffect(() => {
-    if (reportData && !chatSession.current) {
-      try {
-        chatSession.current = createChatSession();
-        setChatMessages([
-          { role: 'model', text: `Hi! I'm your AI assistant. How can I help you with the audit report for ${url}?` }
-        ]);
-      } catch (e: any) {
-        setError(e.message);
-        console.error(e);
-      }
-    }
-  }, [reportData, url]);
-  
-  const handleSendMessage = useCallback(async (message: string) => {
-    if (!chatSession.current) return;
-
-    setChatMessages(prev => [...prev, { role: 'user', text: message }]);
-    setIsChatbotLoading(true);
-
-    try {
-        const response = await chatSession.current.sendMessage(message);
-        const text = response.text;
-        setChatMessages(prev => [...prev, { role: 'model', text }]);
-    } catch (e) {
-        console.error("Chatbot error:", e);
-        setChatMessages(prev => [...prev, { role: 'model', text: "Sorry, I encountered an error. Please try again." }]);
-    } finally {
-        setIsChatbotLoading(false);
-    }
-  }, []);
-
- const handleGeneratePdf = useCallback(async (options: PdfExportOptions) => {
-    const reportElement = document.getElementById('report-content');
-    if (!reportElement || !url) return;
-
-    setIsPdfModalOpen(false);
-    setIsPrinting(true);
-
-    // Temporarily switch to light theme for PDF generation for consistency
-    const originalTheme = document.documentElement.className;
-    document.documentElement.className = 'light';
-
-    // Create a temporary container for elements that need their styles recalculated
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    document.body.appendChild(tempContainer);
-
-
-    const allSections = Array.from(reportElement.querySelectorAll('[data-section-id]')) as HTMLElement[];
-    const sectionsToHide: {element: HTMLElement, originalDisplay: string}[] = [];
-    
-    allSections.forEach(el => {
-        const sectionId = el.dataset.sectionId;
-        if (sectionId && !options.selectedSections.includes(sectionId)) {
-            sectionsToHide.push({ element: el, originalDisplay: el.style.display });
-            el.style.display = 'none';
-        }
-    });
-
-    try {
-        const { default: html2canvas } = await import('html2canvas');
-        const { default: jsPDF } = await import('jspdf');
-
-        const canvas = await html2canvas(reportElement, {
-            scale: 2,
-            backgroundColor: '#ffffff', // Use light theme background color
-            useCORS: true,
-            onclone: (clonedDoc) => {
-              // Ensure the cloned document also has the light theme class
-              clonedDoc.documentElement.className = 'light';
-            }
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgWidth = pdfWidth;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-        
-        let heightLeft = imgHeight;
-        let position = 0;
-        const totalPages = Math.ceil(imgHeight / pdfHeight);
-
-        const addHeaderAndFooter = (pageNumber: number) => {
-            const margin = 15;
-            if (options.logo) {
-                try {
-                     pdf.addImage(options.logo, 'PNG', margin, margin - 10, 20, 20, undefined, 'FAST');
-                } catch (e) { console.error("Error adding logo to PDF:", e); }
-            }
-            pdf.setFontSize(14);
-            pdf.setTextColor('#0D1B2A'); // Use dark text color
-            pdf.text(options.headerText, options.logo ? margin + 25 : margin, margin);
-
-            pdf.setFontSize(8);
-            pdf.text(options.footerText, margin, pdfHeight - margin + 5);
-            const pageStr = `Page ${pageNumber} of ${totalPages}`;
-            const pageStrWidth = pdf.getStringUnitWidth(pageStr) * pdf.getFontSize() / pdf.internal.scaleFactor;
-            pdf.text(pageStr, pdfWidth - margin - pageStrWidth, pdfHeight - margin + 5);
-        };
-        
-        // Add image and header/footer to each page
-        for (let i = 0; i < totalPages; i++) {
-             if (i > 0) pdf.addPage();
-             addHeaderAndFooter(i + 1);
-             position = -(pdfHeight * i);
-             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
-        }
-
-        const cleanUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-        pdf.save(`Website-Audit-${cleanUrl}.pdf`);
-
-    } catch (error) {
-        console.error("Error generating PDF:", error);
-        setError("Sorry, there was an issue creating the PDF. Please try again.");
-    } finally {
-        // Restore visibility of hidden sections
-        sectionsToHide.forEach(item => item.element.style.display = item.originalDisplay);
-        // Restore the original theme
-        document.documentElement.className = originalTheme;
-        // Clean up the temporary container
-        document.body.removeChild(tempContainer);
-        setIsPrinting(false);
-    }
-}, [url]);
-
-  if (!isAuthenticated) {
-      return (
-        <div className="min-h-screen bg-gray-50 dark:bg-brand-primary font-sans">
-            <Login onLogin={handleLogin} onRegister={handleRegister} error={authError} isLoading={isAuthLoading} />
-        </div>
-      )
+  if (isLoading) {
+    return <FullScreenLoader message="Loading session..." />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-brand-primary font-sans">
-      <main className="container mx-auto p-4 md:p-8">
-        <header className="relative text-center mb-8 no-print">
-            <div className="absolute top-0 right-0">
-                <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-brand-text mb-2">Website Audit for Outsource.dk</h1>
-            <p className="text-lg text-gray-600 dark:text-brand-light">Enter a domain to generate a comprehensive, data-driven analysis for your sales pitch.</p>
-        </header>
-
-        <div className="max-w-4xl mx-auto no-print">
-          <AuditForm onAudit={handleAudit} isLoading={isLoading} />
-        </div>
-
-        {isLoading && (
-            <ReportSkeleton />
-        )}
-
-        {error && !isLoading && (
-          <div className="flex flex-col items-center justify-center text-center mt-12 bg-red-100 dark:bg-brand-secondary p-8 rounded-lg animate-fade-in">
-            <ServerCrashIcon className="w-16 h-16 text-brand-red mb-4" />
-            <p className="text-xl font-semibold text-red-600 dark:text-red-400">An Error Occurred</p>
-            <p className="text-gray-600 dark:text-brand-light max-w-md">{error}</p>
-          </div>
-        )}
-
-        {reportData && !isLoading && (
-          <>
-            <div id="report-content" className="mt-8 animate-fade-in print-container">
-              <Report data={reportData} url={url} onPrint={() => setIsPdfModalOpen(true)} isPrinting={isPrinting} />
-              <div data-section-id="pitchGenerator">
-                  <PitchGenerator 
-                      onGenerate={handleGeneratePitch} 
-                      pitches={pitches} 
-                      isLoading={isPitchLoading}
-                  />
-              </div>
-              <div data-section-id="callNotes">
-                  <CallNotes url={url} />
-              </div>
-            </div>
-            <PdfExportModal 
-              isOpen={isPdfModalOpen}
-              onClose={() => setIsPdfModalOpen(false)}
-              onGenerate={handleGeneratePdf}
-              url={url}
-              isGenerating={isPrinting}
-            />
-             <ChatbotTrigger onClick={() => setIsChatbotOpen(true)} />
-             <Chatbot
-                isOpen={isChatbotOpen}
-                onClose={() => setIsChatbotOpen(false)}
-                messages={chatMessages}
-                onSendMessage={handleSendMessage}
-                isLoading={isChatbotLoading}
-              />
-          </>
-        )}
-      </main>
-      <footer className="text-center p-4 mt-8 text-gray-500 dark:text-brand-accent border-t border-gray-200 dark:border-brand-accent/20 no-print">
-        <a href="https://github.com/Intelligennai/Costero-Agency---Website-Audit" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-brand-cyan transition-colors">
-          <GithubIcon className="w-5 h-5" />
-          Powered by Gemini
-        </a>
-      </footer>
-    </div>
+    <Suspense fallback={<FullScreenLoader />}>
+      {!user ? (
+        <Login />
+      ) : !user.agencyProfile ? (
+        <AgencySetup />
+      ) : (
+        <AuditTool />
+      )}
+    </Suspense>
   );
 };
 

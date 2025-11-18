@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import type { ChatMessage } from '../types';
+import { useTranslations } from '../hooks/useTranslations';
 import { CloseIcon, SendIcon, BotIcon, UserIcon } from './Icons';
 
 interface ChatbotProps {
@@ -15,6 +15,7 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const t = useTranslations();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,9 +66,9 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
         <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-brand-accent flex-shrink-0">
           <div className="flex items-center gap-3">
               <BotIcon className="w-6 h-6 text-brand-cyan" />
-              <h2 id="chatbot-heading" className="font-bold text-lg text-gray-900 dark:text-brand-text">AI Assistant</h2>
+              <h2 id="chatbot-heading" className="font-bold text-lg text-gray-900 dark:text-brand-text">{t('chatbot_header')}</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full text-gray-500 dark:text-brand-light hover:bg-gray-100 dark:hover:bg-brand-accent transition-colors" aria-label="Close chat">
+          <button onClick={onClose} className="p-1 rounded-full text-gray-500 dark:text-brand-light hover:bg-gray-100 dark:hover:bg-brand-accent transition-colors" aria-label={t('chatbot_close_aria')}>
             <CloseIcon className="w-6 h-6" />
           </button>
         </header>
@@ -104,13 +105,13 @@ const ChatbotComponent: React.FC<ChatbotProps> = ({ isOpen, onClose, messages, o
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question..."
+              placeholder={t('chatbot_placeholder')}
               className="flex-1 bg-white dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg p-2 text-sm text-gray-900 dark:text-brand-text placeholder-gray-500 dark:placeholder-brand-light resize-none focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all"
               rows={1}
               disabled={isLoading}
-              aria-label="Chat message input"
+              aria-label={t('chatbot_input_aria')}
             />
-            <button type="submit" disabled={isLoading || !input.trim()} className="p-2 bg-brand-cyan text-brand-primary rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Send message">
+            <button type="submit" disabled={isLoading || !input.trim()} className="p-2 bg-brand-cyan text-brand-primary rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label={t('chatbot_send_aria')}>
               <SendIcon className="w-5 h-5" />
             </button>
           </form>

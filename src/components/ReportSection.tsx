@@ -1,6 +1,6 @@
-
 import React from 'react';
 import type { SocialMediaStat, ReviewStats } from '../types';
+import { useTranslations } from '../hooks/useTranslations';
 import { FacebookIcon, InstagramIcon, TiktokIcon, TwitterIcon, LinkedInIcon, YouTubeIcon, PinterestIcon, RedditIcon, TrustpilotIcon, GoogleIcon } from './Icons';
 
 interface ReportSectionProps {
@@ -37,6 +37,7 @@ const SocialIcon: React.FC<{ platform: string; className?: string }> = ({ platfo
 const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, comment, icon, className = '', socialMediaStats, trustpilot, googleReviews, sectionId }) => {
   const scoreColor = score !== undefined ? getScoreColor(score) : '';
   const hasReputationData = trustpilot || googleReviews;
+  const t = useTranslations();
 
   return (
     <div data-section-id={sectionId} className={`bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
@@ -51,7 +52,7 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
       </div>
       <div className="text-gray-800 dark:text-brand-text flex-grow">
         {comment.split('\n').map((line, index) => (
-          <p key={index} className={line.trim().startsWith('*') ? 'ml-4' : ''}>
+          <p key={`${line}-${index}`} className={line.trim().startsWith('*') ? 'ml-4' : ''}>
             {line}
           </p>
         ))}
@@ -59,7 +60,7 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
       
       {socialMediaStats && socialMediaStats.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
-          <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">Social Media Followers</h5>
+          <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">{t('report_social_media_followers')}</h5>
           <ul className="space-y-2">
             {socialMediaStats.map((stat, index) => (
               <li key={index} className="flex items-center justify-between text-gray-800 dark:text-brand-text">
@@ -76,13 +77,13 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
 
       {hasReputationData && (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
-            <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">Online Reputation</h5>
+            <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">{t('report_online_reputation')}</h5>
             <ul className="space-y-2">
                 {googleReviews && (
                     <li className="flex items-center justify-between text-gray-800 dark:text-brand-text">
                         <span className="flex items-center gap-2">
                             <GoogleIcon className="w-5 h-5 text-gray-500 dark:text-brand-light" />
-                            Google Reviews
+                            {t('report_google_reviews')}
                         </span>
                         <div className="text-right">
                             <p className="font-semibold text-brand-yellow">{googleReviews.score}</p>
@@ -94,7 +95,7 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
                     <li className="flex items-center justify-between text-gray-800 dark:text-brand-text">
                         <span className="flex items-center gap-2">
                             <TrustpilotIcon className="w-5 h-5 text-brand-green" />
-                            Trustpilot
+                            {t('report_trustpilot')}
                         </span>
                          <div className="text-right">
                             <p className="font-semibold text-brand-yellow">{trustpilot.score}</p>

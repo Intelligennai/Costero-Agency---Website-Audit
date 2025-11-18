@@ -1,4 +1,3 @@
-
 export interface AuditSection {
   score: number;
   comment: string;
@@ -36,14 +35,29 @@ export interface AuditReportData {
   googleMyBusiness: AnalysisSection;
 }
 
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
+export interface AgencyProfile {
+  name: string;
+  services: string[];
+}
+
+export interface BrandingSettings {
+  logo: string | null; // Base64 string for the logo
+}
+
+export interface User {
+  email: string;
+  agencyProfile?: AgencyProfile;
+  branding: BrandingSettings;
+}
+
 export interface PdfExportOptions {
   selectedSections: string[];
   headerText: string;
   footerText: string;
-  logo: string | null; // base64 encoded image
-}
-
-export interface ChatMessage {
-  role: 'user' | 'model';
-  text: string;
+  logo: string | null;
 }

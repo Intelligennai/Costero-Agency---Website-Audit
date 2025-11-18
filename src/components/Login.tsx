@@ -1,22 +1,20 @@
-
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { useTranslations } from '../hooks/useTranslations';
 import { LockIcon, LoaderIcon, UserIcon } from './Icons';
+import type { TranslationKey } from '../translations';
 
-interface LoginProps {
-  onLogin: (password: string) => void;
-  onRegister: (email: string, password: string) => void;
-  error: string;
-  isLoading: boolean;
-}
-
-export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoading }) => {
+export const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState('');
+  
+  const { login, register, error, isLoading } = useAuth();
+  const t = useTranslations();
 
-  // Reset form state when mode changes or external error is cleared
+  // Reset form state when mode changes
   useEffect(() => {
     setEmail('');
     setPassword('');
@@ -24,9 +22,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
     setFormError('');
   }, [mode]);
   
+  // Display auth hook errors
   useEffect(() => {
-    setFormError(error);
-  }, [error]);
+    if (error) {
+        setFormError(t(error as TranslationKey));
+    }
+  }, [error, t]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,15 +37,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
 
     if (mode === 'register') {
       if (password !== confirmPassword) {
-        setFormError("Passwords do not match.");
+        setFormError(t('login_passwords_no_match'));
         return;
       }
-      onRegister(email, password);
+      register(email, password);
     } else {
-      // For simplicity, the original login logic only used a password.
-      // In a real app, this would use email and password.
-      // We'll stick to the original requirement.
-      onLogin(password);
+      login(email, password);
     }
   };
 
@@ -53,18 +51,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-white dark:bg-brand-primary">
       <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-brand-secondary rounded-xl shadow-lg animate-fade-in">
         <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-brand-text mb-2">
-                {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+                {mode === 'login' ? t('login_welcome_back') : t('login_create_account')}
             </h1>
             <p className="text-gray-500 dark:text-brand-light">
-                {mode === 'login' ? 'Please enter the password to access the tool.' : 'Sign up to start auditing websites.'}
+                {mode === 'login' ? t('login_enter_password_prompt') : t('login_signup_prompt')}
             </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {mode === 'register' && (
              <div className="relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <UserIcon className="h-5 w-5 text-gray-400 dark:text-brand-light" />
@@ -78,11 +75,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
-                  placeholder="Email address"
+                  placeholder={t('login_email_placeholder')}
                   disabled={isLoading}
                 />
               </div>
-          )}
 
           <div className="relative">
              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -97,7 +93,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
-              placeholder="Password"
+              placeholder={t('login_password_placeholder')}
               disabled={isLoading}
             />
           </div>
@@ -116,7 +112,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-brand-primary border-2 border-gray-300 dark:border-brand-accent rounded-lg text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 focus:ring-brand-cyan transition-all disabled:opacity-70"
-                placeholder="Confirm Password"
+                placeholder={t('login_confirm_password_placeholder')}
                 disabled={isLoading}
               />
             </div>
@@ -135,19 +131,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
               {isLoading ? (
                 <>
                   <LoaderIcon className="w-5 h-5 animate-spin mr-2" />
-                  {mode === 'login' ? 'Authenticating...' : 'Creating Account...'}
+                  {mode === 'login' ? t('login_authenticating') : t('login_creating_account')}
                 </>
               ) : (
-                mode === 'login' ? 'Access Tool' : 'Create Account'
+                mode === 'login' ? t('login_access_tool') : t('login_create_account')
               )}
             </button>
           </div>
         </form>
 
         <p className="text-center text-sm text-gray-500 dark:text-brand-light">
-          {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
-          <button onClick={toggleMode} className="font-semibold text-brand-cyan hover:underline ml-1 focus:outline-none">
-            {mode === 'login' ? 'Sign Up' : 'Log In'}
+          {mode === 'login' ? t('login_no_account') : t('login_already_have_account')}
+          <button onClick={toggleMode} disabled={isLoading} className="font-semibold text-brand-cyan hover:underline ml-1 focus:outline-none disabled:opacity-50">
+            {mode === 'login' ? t('login_sign_up') : t('login_log_in')}
           </button>
         </p>
 
@@ -155,3 +151,5 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, error, isLoad
     </div>
   );
 };
+
+export default Login;

@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { SparklesIcon, ClipboardIcon, CheckIcon, LoaderIcon } from './Icons';
 import SkeletonLoader from './SkeletonLoader';
+import { useTranslations } from '../hooks/useTranslations';
 
 interface PitchGeneratorProps {
   onGenerate: () => void;
@@ -12,6 +12,7 @@ interface PitchGeneratorProps {
 const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pitches, isLoading }) => {
   const [selectedPitchIndex, setSelectedPitchIndex] = useState(0);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     if (!isLoading) {
@@ -30,11 +31,11 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
   const hasPitches = pitches && pitches.length > 0;
 
   return (
-    <div className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '200ms' }}>
+    <div data-section-id="pitchGenerator" className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '200ms' }}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
         <h3 className="text-2xl font-bold text-gray-700 dark:text-brand-light flex items-center gap-2">
             <SparklesIcon className="w-6 h-6 text-brand-yellow" />
-            Auto-Pitch Generator
+            {t('pitch_generator_title')}
         </h3>
         <button
           onClick={onGenerate}
@@ -44,9 +45,9 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
           {isLoading ? (
             <>
                 <LoaderIcon className="w-5 h-5 animate-spin"/>
-                Generating...
+                {t('pitch_generator_button_generating')}
             </>
-          ) : 'Generate Pitches'}
+          ) : t('pitch_generator_button_generate')}
         </button>
       </div>
       
@@ -82,7 +83,7 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
                       : 'text-gray-600 hover:bg-gray-300/70 dark:text-brand-light dark:hover:bg-brand-accent/50'
                   }`}
                 >
-                  Variation {index + 1}
+                  {t('pitch_variation')} {index + 1}
                 </label>
               </div>
             ))}
@@ -93,17 +94,17 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
                 onClick={() => handleCopy(selectedPitchIndex)}
                 className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1 text-sm rounded-md bg-gray-200 text-gray-700 dark:text-brand-text dark:bg-brand-accent hover:bg-gray-300 dark:hover:bg-brand-light transition-colors disabled:opacity-50"
                 disabled={copiedIndex === selectedPitchIndex}
-                title="Copy to clipboard"
+                title={t('copy_tooltip')}
             >
                 {copiedIndex === selectedPitchIndex ? (
                     <>
                         <CheckIcon className="w-4 h-4 text-brand-green" />
-                        <span>Copied!</span>
+                        <span>{t('copied')}</span>
                     </>
                 ) : (
                     <>
                         <ClipboardIcon className="w-4 h-4" />
-                        <span>Copy</span>
+                        <span>{t('copy')}</span>
                     </>
                 )}
             </button>

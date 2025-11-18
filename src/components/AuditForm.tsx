@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useTranslations } from '../hooks/useTranslations';
 import { SearchIcon } from './Icons';
 
 interface AuditFormProps {
@@ -10,6 +10,7 @@ interface AuditFormProps {
 const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) => {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+  const t = useTranslations();
 
   const validateAndCleanUrl = (value: string): string | null => {
     // Remove protocol, www, and any trailing paths for a clean domain.
@@ -20,7 +21,7 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
       .replace(/\/.*$/, '');
     
     if (!processedUrl) {
-      setError('Please enter a website domain to analyze.');
+      setError(t('audit_form_error_domain_required'));
       return null;
     }
 
@@ -28,7 +29,7 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
     const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/;
 
     if (!domainRegex.test(processedUrl)) {
-      setError('Please enter a valid domain format (e.g., example.com).');
+      setError(t('audit_form_error_invalid_format'));
       return null;
     }
 
@@ -61,7 +62,7 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
           type="text"
           value={url}
           onChange={handleChange}
-          placeholder="e.g., example.com"
+          placeholder={t('audit_form_placeholder')}
           className={`w-full pl-12 pr-32 py-4 bg-white dark:bg-brand-secondary border-2 rounded-full text-gray-900 dark:text-brand-text placeholder-gray-400 dark:placeholder-brand-light focus:outline-none focus:ring-2 transition-all ${
             error
               ? 'border-brand-red focus:ring-brand-red'
@@ -76,7 +77,7 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
           disabled={isLoading}
           className="absolute inset-y-0 right-0 m-2 px-6 py-2 bg-brand-cyan text-brand-primary font-bold rounded-full hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Analyzing...' : 'Analyze'}
+          {isLoading ? t('audit_form_button_analyzing') : t('audit_form_button_analyze')}
         </button>
       </form>
       {error && (
