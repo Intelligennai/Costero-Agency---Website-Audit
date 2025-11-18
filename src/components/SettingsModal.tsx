@@ -19,11 +19,14 @@ const fileToBase64 = (file: File): Promise<string> => {
 };
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { user, updateUser, isLoading } = useAuthContext();
+  // FIX: Use 'agency' and 'updateAgency' from the context, not 'user' and 'updateUser'.
+  const { agency, updateAgency, isLoading } = useAuthContext();
   const t = useTranslations();
   
-  const [branding, setBranding] = useState<BrandingSettings>(user?.branding || { logo: null });
-  const [logoPreview, setLogoPreview] = useState<string | null>(user?.branding.logo || null);
+  // FIX: Initialize state from the 'agency' object's branding.
+  const [branding, setBranding] = useState<BrandingSettings>(agency?.branding || { logo: null });
+  // FIX: Initialize preview from the 'agency' object's branding.
+  const [logoPreview, setLogoPreview] = useState<string | null>(agency?.branding.logo || null);
 
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,7 +47,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleSave = async () => {
-    await updateUser({ branding });
+    // FIX: Call 'updateAgency' with the correct payload.
+    await updateAgency({ branding });
     onClose();
   };
   

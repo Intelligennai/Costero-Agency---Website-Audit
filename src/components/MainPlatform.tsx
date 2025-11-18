@@ -1,67 +1,92 @@
 import React, { useState, lazy, Suspense } from 'react';
-import type { SavedAudit } from '../types';
+import type { SavedAudit, AuditReportData } from '../types';
 import { useAuthContext } from '../hooks/useAuth';
+import { LoaderIcon } from './Icons';
 
 const Header = lazy(() => import('./Header'));
 const Dashboard = lazy(() => import('./Dashboard'));
-const AuditTool = lazy(() => import('./AuditTool'));
+const NewAudit = lazy(() => import('./NewAudit'));
+const AuditViewer = lazy(() => import('./AuditViewer'));
 
-type View = 'dashboard' | 'auditTool';
+type View = 'dashboard' | 'newAudit' | 'viewAudit';
 
 const MainPlatform: React.FC = () => {
-    const { user, addAudit, deleteAudit } = useAuthContext();
+    const { agency, addAudit, deleteAudit } = useAuthContext();
     const [currentView, setCurrentView] = useState<View>('dashboard');
-    const [selectedAudit, setSelectedAudit] = useState<SavedAudit | undefined>(undefined);
+    const [selectedAudit, setSelectedAudit] = useState<SavedAudit | null>(null);
 
     const handleStartNewAudit = () => {
-        setSelectedAudit(undefined);
-        setCurrentView('auditTool');
+        setSelectedAudit(null);
+        setCurrentView('newAudit');
     };
 
     const handleViewAudit = (audit: SavedAudit) => {
         setSelectedAudit(audit);
-        setCurrentView('auditTool');
+        setCurrentView('viewAudit');
     };
     
     const handleReturnToDashboard = () => {
-        setSelectedAudit(undefined);
+        setSelectedAudit(null);
         setCurrentView('dashboard');
     }
 
-    const handleSaveAudit = (audit: SavedAudit) => {
-        addAudit(audit);
+    const handleAuditComplete = (url: string, reportData: AuditReportData) => {
+        const newAudit: SavedAudit = {
+            id: Date.now().toString(),
+            url,
+            reportData,
+            createdAt: new Date().toISOString(),
+        };
+        addAudit(newAudit);
+        setSelectedAudit(newAudit);
+        setCurrentView('viewAudit');
     };
 
     const handleDeleteAudit = (auditId: string) => {
         deleteAudit(auditId);
+        // If the deleted audit is the one being viewed, return to dashboard
+        if(selectedAudit?.id === auditId) {
+            handleReturnToDashboard();
+        }
     };
+    
+    const renderContent = () => {
+        switch (currentView) {
+            case 'newAudit':
+                return <NewAudit onAuditComplete={handleAuditComplete} onReturnToDashboard={handleReturnToDashboard} />;
+            case 'viewAudit':
+                if (selectedAudit) {
+                    return <AuditViewer audit={selectedAudit} onReturnToDashboard={handleReturnToDashboard} />;
+                }
+                // Fallback to dashboard if no audit is selected
+                handleReturnToDashboard();
+                return null;
+            case 'dashboard':
+            default:
+                return (
+                    <Dashboard 
+                        audits={agency?.audits || []}
+                        onNewAudit={handleStartNewAudit}
+                        onViewAudit={handleViewAudit}
+                        onDeleteAudit={handleDeleteAudit}
+                    />
+                );
+        }
+    }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-brand-primary font-sans">
-             <Suspense fallback={<div className="h-20" />}>
+        <div className="min-h-screen bg-gray-50 dark:bg-brand-primary font-sans">
+             <Suspense fallback={<div className="h-20 bg-white dark:bg-brand-primary" />} >
                 <Header onNavigateToDashboard={handleReturnToDashboard} />
             </Suspense>
             <main>
-                {currentView === 'dashboard' && (
-                    <Suspense fallback={<div>Loading Dashboard...</div>}>
-                        <Dashboard 
-                            audits={user?.audits || []}
-                            onNewAudit={handleStartNewAudit}
-                            onViewAudit={handleViewAudit}
-                            onDeleteAudit={handleDeleteAudit}
-                        />
-                    </Suspense>
-                )}
-                {currentView === 'auditTool' && (
-                     <Suspense fallback={<div>Loading Tool...</div>}>
-                        <AuditTool 
-                            key={selectedAudit?.id || 'new'}
-                            initialAudit={selectedAudit}
-                            onNewAudit={handleStartNewAudit}
-                            onAuditSaved={handleSaveAudit}
-                        />
-                    </Suspense>
-                )}
+                <Suspense fallback={
+                    <div className="flex items-center justify-center p-20">
+                        <LoaderIcon className="w-12 h-12 animate-spin text-brand-cyan" />
+                    </div>
+                }>
+                    {renderContent()}
+                </Suspense>
             </main>
         </div>
     );

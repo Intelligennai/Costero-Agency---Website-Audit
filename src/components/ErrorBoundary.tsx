@@ -3,7 +3,7 @@ import { translations } from '../translations';
 import { ServerCrashIcon } from './Icons';
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface State {
@@ -12,12 +12,9 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Initialize state as a class property instead of in the constructor.
-  // This is a more modern and common pattern in React class components with TypeScript
-  // and resolves the type errors related to 'this.state' and 'this.props'.
-  state: State = {
+  public state: State = {
     hasError: false,
-    error: null,
+    error: null
   };
 
   static getDerivedStateFromError(error: Error): State {
@@ -30,7 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      // Fallback to English for error boundary as context might not be available
+      // Default to English for the error boundary as language context might have failed.
       const t = translations.en; 
       
       return (

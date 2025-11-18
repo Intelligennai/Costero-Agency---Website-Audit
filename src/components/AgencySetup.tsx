@@ -8,7 +8,8 @@ const AgencySetup: React.FC = () => {
     const [url, setUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { updateUser } = useAuth();
+    // Fix: The auth hook returns 'updateAgency', not 'updateUser'.
+    const { updateAgency } = useAuth();
     const t = useTranslations();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +24,8 @@ const AgencySetup: React.FC = () => {
         setError('');
         try {
             const profile = await analyzeAgencyWebsite(processedUrl);
-            await updateUser({ agencyProfile: profile });
+            // Fix: Call 'updateAgency' with the correct payload structure: { profile }.
+            await updateAgency({ profile });
             // The AuthProvider will detect the user update and redirect to the main app
         } catch (err) {
             console.error(err);

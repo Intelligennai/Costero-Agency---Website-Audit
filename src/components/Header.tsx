@@ -11,12 +11,15 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onNavigateToDashboard }) => {
-  const { user, logout } = useAuthContext();
+  // FIX: Destructure 'agency' from the context to access its properties.
+  const { agency, logout } = useAuthContext();
   const t = useTranslations();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const agencyName = user?.agencyProfile?.name || 'My Agency';
-  const logo = user?.branding.logo;
+  // FIX: Access 'profile' from the 'agency' object.
+  const agencyName = agency?.profile?.name || 'My Agency';
+  // FIX: Access 'branding' from the 'agency' object.
+  const logo = agency?.branding.logo;
 
   return (
     <>

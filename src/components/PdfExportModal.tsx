@@ -23,8 +23,10 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 const PdfExportModalComponent: React.FC<PdfExportModalProps> = ({ isOpen, onClose, onGenerate, url, isGenerating }) => {
   const t = useTranslations();
-  const { user } = useAuthContext();
-  const agencyName = user?.agencyProfile?.name || 'Your Agency';
+  // FIX: Destructure 'agency' instead of 'user' to access agency-specific data.
+  const { agency } = useAuthContext();
+  // FIX: Access 'profile' from the 'agency' object.
+  const agencyName = agency?.profile?.name || 'Your Agency';
 
   const allSections = [
     { id: 'summary', label: t('pdf_section_summary') },
@@ -50,13 +52,17 @@ const PdfExportModalComponent: React.FC<PdfExportModalProps> = ({ isOpen, onClos
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   
   useEffect(() => {
-    if(user) {
+    // FIX: Check for 'agency' existence.
+    if(agency) {
         setHeaderText(t('pdf_modal_default_header', { url }));
         setFooterText(t('pdf_modal_default_footer', { agencyName }));
-        setLogo(user.branding.logo);
-        setLogoPreview(user.branding.logo);
+        // FIX: Access 'branding' from the 'agency' object.
+        setLogo(agency.branding.logo);
+        // FIX: Access 'branding' from the 'agency' object.
+        setLogoPreview(agency.branding.logo);
     }
-  }, [isOpen, user, url, agencyName, t]);
+    // FIX: Add 'agency' to the dependency array.
+  }, [isOpen, agency, url, agencyName, t]);
 
 
   const handleSectionChange = (sectionId: string) => {

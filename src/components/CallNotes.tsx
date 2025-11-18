@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon, ClipboardIcon } from './Icons';
+import { NotesIcon, CheckIcon, LoaderIcon, TrashIcon, ClipboardIcon, LockIcon } from './Icons';
 import { useTranslations } from '../hooks/useTranslations';
 
 interface CallNotesProps {
   url: string;
+  mode?: 'full' | 'demo';
 }
 
-const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
+const CallNotesComponent: React.FC<CallNotesProps> = ({ url, mode = 'full' }) => {
   const [notes, setNotes] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isCopied, setIsCopied] = useState(false);
@@ -17,21 +18,24 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
 
   // Load initial notes from localStorage when the URL changes
   useEffect(() => {
-    try {
-      const savedNotes = localStorage.getItem(storageKey) || '';
-      setNotes(savedNotes);
-    } catch (error) {
-      console.error("Failed to read from localStorage", error);
-      setNotes('');
+    if (mode === 'full') {
+      try {
+        const savedNotes = localStorage.getItem(storageKey) || '';
+        setNotes(savedNotes);
+      } catch (error) {
+        console.error("Failed to read from localStorage", error);
+        setNotes('');
+      }
     }
     // Reset state for the new URL
     isInitialMount.current = true;
     setSaveStatus('idle');
-  }, [storageKey]);
+  }, [storageKey, mode]);
 
   // Auto-save notes with debounce, skipping the initial load
   useEffect(() => {
-    if (isInitialMount.current) {
+    // Only save if in full mode
+    if (mode === 'demo' || isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
@@ -49,7 +53,7 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
     }, 1000); // 1-second debounce
 
     return () => clearTimeout(timer);
-  }, [notes, storageKey]);
+  }, [notes, storageKey, mode]);
 
   const handleClear = useCallback(() => {
     if (window.confirm(t('call_notes_clear_confirm'))) {
@@ -87,7 +91,6 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
           </span>
         );
       case 'idle':
-        // Show "All changes saved" only if it's not the initial load and there's content
         if (notes.length > 0) {
             return (
                 <span className="text-gray-400 dark:text-brand-light/70 flex items-center gap-2 text-sm">
@@ -96,11 +99,23 @@ const CallNotesComponent: React.FC<CallNotesProps> = ({ url }) => {
                 </span>
             );
         }
-        return <div className="h-5"></div>; // Placeholder to prevent layout shift
+        return <div className="h-5"></div>; 
       default:
         return <div className="h-5"></div>;
     }
   };
+
+  if (mode === 'demo') {
+    return (
+      <div data-section-id="callNotes" className="mt-8 bg-white dark:bg-brand-secondary p-6 rounded-lg no-print animate-slide-in border border-gray-200 dark:border-brand-accent" style={{ animationDelay: '300ms' }}>
+         <div className="flex flex-col items-center justify-center text-center p-6 bg-gray-50 dark:bg-brand-primary rounded-lg border-2 border-dashed border-gray-300 dark:border-brand-accent">
+          <LockIcon className="w-12 h-12 text-gray-400 dark:text-brand-accent mb-4"/>
+          <h4 className="text-lg font-bold text-gray-800 dark:text-brand-text">{t('demo_notes_locked_title')}</h4>
+          <p className="text-sm text-gray-600 dark:text-brand-light max-w-sm">{t('demo_notes_locked_text')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div data-section-id="callNotes" className="mt-8 bg-white dark:bg-brand-secondary p-6 rounded-lg no-print animate-slide-in border border-gray-200 dark:border-brand-accent" style={{ animationDelay: '300ms' }}>

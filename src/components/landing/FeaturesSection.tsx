@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslations } from '../../hooks/useTranslations';
 import { 
-    FeatureAuditIconComponent as FeatureAuditIcon, 
-    FeatureBrandingIconComponent as FeatureBrandingIcon, 
-    FeatureCompetitorIconComponent as FeatureCompetitorIcon,
-    FeaturePitchIconComponent as FeaturePitchIcon,
-    FeatureDataIconComponent as FeatureDataIcon,
-    FeatureDashboardIconComponent as FeatureDashboardIcon
+    FeatureAuditIcon, 
+    FeatureBrandingIcon, 
+    FeatureCompetitorIcon,
+    FeaturePitchIcon,
+    FeatureDataIcon,
+    FeatureDashboardIcon
 } from '../Icons';
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (

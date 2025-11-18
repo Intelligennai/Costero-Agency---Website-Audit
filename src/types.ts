@@ -1,3 +1,6 @@
+import type { Chat } from '@google/genai';
+
+// --- Audit Report Data Structure ---
 export interface AuditSection {
   score: number;
   comment: string;
@@ -35,18 +38,17 @@ export interface AuditReportData {
   googleMyBusiness: AnalysisSection;
 }
 
-export interface ChatMessage {
-  role: 'user' | 'model';
-  text: string;
-}
-
-// FIX: Added SavedAudit interface to be used for storing audit history.
 export interface SavedAudit {
   id: string;
   url: string;
   reportData: AuditReportData;
   createdAt: string;
+  chatSession?: Chat;
+  chatMessages?: ChatMessage[];
 }
+
+
+// --- Agency & User Data Structure ---
 
 export interface AgencyProfile {
   name: string;
@@ -57,12 +59,33 @@ export interface BrandingSettings {
   logo: string | null; // Base64 string for the logo
 }
 
+export type UserRole = 'admin' | 'member';
+
+export interface TeamMember {
+  email: string;
+  role: UserRole;
+}
+
+export interface Agency {
+  id: string;
+  profile: AgencyProfile | null;
+  branding: BrandingSettings;
+  audits: SavedAudit[];
+  members: TeamMember[];
+}
+
 export interface User {
   email: string;
-  agencyProfile?: AgencyProfile;
-  branding: BrandingSettings;
-  // FIX: Added audits property to user to store their audit history.
-  audits?: SavedAudit[];
+  agencyId: string;
+  role: UserRole;
+}
+
+
+// --- UI & Interaction Types ---
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  text: string;
 }
 
 export interface PdfExportOptions {

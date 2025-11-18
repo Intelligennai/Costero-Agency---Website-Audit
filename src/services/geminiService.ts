@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { AuditReportData, AgencyProfile } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const auditSectionSchema = {
   type: Type.OBJECT,
@@ -35,7 +35,7 @@ const auditSchema = {
             type: Type.OBJECT,
             properties: {
               platform: { type: Type.STRING, description: "Name of the social media platform (e.g., Facebook, Instagram, LinkedIn, X, TikTok)." },
-              followers: { type: Type.STRING, description: "Number of followers/likes as a string (e.g., '1,234', '5.6k', 'Ukendt')." }
+              followers: { type: Type.STRING, description: "Number of followers/likes as a string (e.g., '1,234', '5.6k', 'Unknown')." }
             },
             required: ['platform', 'followers']
           }
@@ -45,7 +45,7 @@ const auditSchema = {
           description: "Trustpilot review statistics. Omit if not found.",
           properties: {
             score: { type: Type.STRING, description: "Overall score, e.g., '4.5/5'." },
-            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '1,234 anmeldelser'." }
+            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '1,234 reviews'." }
           },
           required: ['score', 'reviewCount']
         },
@@ -54,7 +54,7 @@ const auditSchema = {
           description: "Google Reviews statistics from their Business Profile. Omit if not found.",
           properties: {
             score: { type: Type.STRING, description: "Overall score, e.g., '4.8/5'." },
-            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '512 anmeldelser'." }
+            reviewCount: { type: Type.STRING, description: "Total number of reviews, e.g., '512 reviews'." }
           },
           required: ['score', 'reviewCount']
         }
@@ -122,48 +122,37 @@ export const generateAuditReport = async (url: string, agencyProfile: AgencyProf
 
     Evaluate the following categories. Provide a score from 0 to 100 for the first 5, and a concise, actionable comment IN ${targetLanguage} for each category.
 
-    1.  **Hjemmeside & Brugeroplevelse (Website & UX):**
+    1.  **Website & UX:**
         - Assess design, UX, CTAs, and mobile-friendliness. Frame comment around ${agencyProfile.name}'s ability to build a high-converting website.
 
-    2.  **SEO (Søgemaskineoptimering):**
-        - Analyze on-page and technical SEO. Your analysis must go beyond basics and include these advanced topics:
-        - **Schema Markup:** Check for structured data (e.g., \`Organization\`, \`LocalBusiness\`, \`Product\`, \`FAQPage\` schema). Comment on its presence and correct implementation. If missing, identify it as a major opportunity for rich snippets in search results.
-        - **Internal Linking:** Evaluate the internal linking strategy. Are key pages well-linked together to show their relationship? Is anchor text descriptive and relevant? Is there a clear, logical link flow, or are there important pages with very few internal links (orphaned pages)?
-        - **Core On-Page Factors:** Also include analysis of title/meta tags, H1-H6 structure, and image alt-tags.
-        - Frame the final comment to highlight missed opportunities for organic traffic and improved search visibility.
+    2.  **SEO (Search Engine Optimization):**
+        - Analyze on-page and technical SEO, including Schema Markup, internal linking, title/meta tags, H1-H6 structure, and image alt-tags. Frame the comment to highlight missed opportunities for organic traffic.
 
-    3.  **Digital Marketing Tilstedeværelse (Digital Marketing Presence):**
-        - Look for social media links (Facebook, Instagram, LinkedIn, X, TikTok, etc.). For each platform found, find and list the number of followers (use 'Ukendt' if not found).
-        - CRITICAL: Search for the company's Trustpilot page and their Google Business Profile. If found, extract their overall score (e.g., '4.5/5') and total number of reviews (e.g., '1,234 anmeldelser'). Omit if not found.
-        - Check for newsletters, and tracking pixels to gauge their marketing activity.
-        - Frame the comment to suggest growth via integrated campaigns, and comment on their online reputation based on the review scores.
+    3.  **Digital Marketing Presence:**
+        - Find social media links and list follower counts.
+        - CRITICAL: Search for the company's Trustpilot page and Google Business Profile. If found, extract their score and total review count. Omit if not found.
+        - Check for newsletters and tracking pixels. Frame comment to suggest growth via integrated campaigns.
 
-    4.  **Indhold & Kommunikation (Content & Communication):**
-        - Evaluate copy, tone-of-voice, and value. Frame comment by connecting strong content to building trust and authority.
+    4.  **Content & Communication:**
+        - Evaluate copy, tone-of-voice, and value. Frame comment by connecting strong content to building trust.
     
     5.  **AI & Automation:**
-        - Check for chatbots and automation potential in workflows. Frame comment to introduce ${agencyProfile.name}'s ability to build intelligent solutions, if that is one of their listed services.
+        - Check for chatbots and automation potential. Frame comment to introduce ${agencyProfile.name}'s AI solutions if applicable.
 
-    6.  **Annoncering & Optimering (Advertising & Optimization):**
+    6.  **Advertising & Optimization:**
         - This section should NOT have a score.
-        - Scan for evidence of Google Ads (e.g., gclid parameters) and Meta Ads (Facebook Pixel).
-        - **Competitor Analysis:** You MUST attempt to find 1-2 key competitors in their industry and region. Briefly summarize their advertising strategy (e.g., what channels they seem to be using, what their key messaging is). Use this comparison to strengthen your recommendations.
-        - **Industry Benchmarks:** To provide context, you MUST research and include **specific** industry benchmarks for a similar business in their local region. For example, if it's a SaaS company, find the average conversion rate. If it's e-commerce, find average CTRs. If it's a local service, find average Cost-Per-Lead. This specific context is vital.
-        - Based on your findings:
-          - If ad evidence is found, provide a concise summary of their current advertising strategy and compare their likely performance against both the competitor strategies and the industry benchmarks you found.
-          - If no ad evidence is found, state that this is a major untapped opportunity. Use the competitor activities and industry benchmarks to quantify what they are missing out on.
-        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how ${agencyProfile.name} can improve their results. These should be specific and data-driven, referencing the competitive landscape.
-        - Frame this entire section as a major growth opportunity.
+        - Scan for evidence of Google Ads and Meta Ads.
+        - **Competitor Analysis:** You MUST find 1-2 key competitors. Briefly summarize their advertising strategy.
+        - **Industry Benchmarks:** You MUST research and include **specific** industry benchmarks for a similar business in their local region (e.g., average conversion rate, CTR, Cost-Per-Lead).
+        - Provide a concise summary comparing their likely performance against competitors and benchmarks.
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how ${agencyProfile.name} can improve results.
     
-    7. **Google My Business Optimering:**
+    7. **Google My Business Optimization:**
         - This section should NOT have a score.
-        - Search for the company's Google Business Profile (GMB).
-        - Analyze its completeness: review count & rating, response rate to reviews, photo quality and quantity, recent posts, and accuracy of business information (NAP).
-        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how ${agencyProfile.name} can improve their GMB listing for better local visibility.
-        - Frame this as a critical component for local SEO and attracting nearby customers.
+        - Analyze the completeness of their Google Business Profile.
+        - Provide 3-4 concrete, actionable recommendations as bullet points (using '*') for how to improve their GMB listing for local visibility.
 
-    Finally, provide an "Overall Potential" score (0-100) indicating how likely this prospect is a good fit for ${agencyProfile.name}.
-    Also, write a 2-3 sentence executive summary of the most critical findings.
+    Finally, provide an "Overall Potential" score (0-100) and a 2-3 sentence executive summary.
 
     Provide the entire output in a single JSON object. Do not include any markdown formatting like \`\`\`json.
   `;
@@ -210,22 +199,18 @@ export const generateSalesPitch = async (reportData: AuditReportData, agencyProf
   const targetLanguage = languageMap[language] || 'ENGLISH';
 
   const prompt = `
-    Based on the following digital marketing audit report for a potential client, generate an array of 3 compelling and concise 30-second sales pitch variations in ${targetLanguage}.
+    Based on the following digital marketing audit report, generate an array of 3 compelling, concise 30-second sales pitch variations in ${targetLanguage}.
     The pitch is for a meeting booker from ${agencyProfile.name}. The goal is to secure a meeting.
-    Each pitch should highlight a key pain point from the audit but from a different angle.
+    Each pitch should highlight a key pain point from the audit from a different angle.
 
-    - **Variation 1 (Data-Driven):** Focus heavily on the specific numbers and benchmarks from the 'advertisingOptimization' or 'googleMyBusiness' sections. Be direct and analytical.
-    - **Variation 2 (Rapport-Building):** Start with a genuine compliment and frame the opportunity in a more collaborative, less aggressive way.
-    - **Variation 3 (Urgency-Focused):** Emphasize the risk of inaction and what they are losing to competitors by not addressing the identified issues.
-
-    Use the report data to make each pitch specific and actionable. End each with a clear, low-pressure call to action.
-
-    The tone should be professional, helpful, and confident.
+    - **Variation 1 (Data-Driven):** Focus heavily on specific numbers and benchmarks from the 'advertisingOptimization' or 'googleMyBusiness' sections.
+    - **Variation 2 (Rapport-Building):** Start with a compliment and frame the opportunity in a more collaborative way.
+    - **Variation 3 (Urgency-Focused):** Emphasize the risk of inaction and what they are losing to competitors.
 
     Audit Report Data:
     ${JSON.stringify(reportData, null, 2)}
 
-    Provide the entire output in a single JSON object with a "pitches" key containing the array of strings. Do not include any markdown formatting like \`\`\`json.
+    Provide the entire output in a single JSON object with a "pitches" key. Do not include markdown formatting.
   `;
 
   const response = await ai.models.generateContent({
@@ -277,8 +262,8 @@ export const analyzeAgencyWebsite = async (url: string): Promise<AgencyProfile> 
         Analyze the content of the website at this URL: ${url}.
         Your goal is to identify the company's name and the specific digital marketing services it provides.
         
-        1.  **Company Name:** Find the official name of the company. It's usually in the header, footer, or 'About Us' page.
-        2.  **Services:** Scan the entire website, especially pages like 'Services', 'What We Do', or the homepage, to find a list of their offerings. Focus only on digital marketing services. Examples include: "SEO", "Web Design", "Google Ads", "Social Media Management", "Content Marketing", "PPC", "Email Marketing", "AI Chatbots". Be as specific as possible based on the text. If they just say "Marketing", try to find more details.
+        1.  **Company Name:** Find the official name of the company.
+        2.  **Services:** Scan the website to find a list of their offerings. Focus only on digital marketing services (e.g., "SEO", "Web Design", "Google Ads").
 
         Return the result as a single JSON object. Do not include any markdown formatting.
     `;

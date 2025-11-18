@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SparklesIcon, ClipboardIcon, CheckIcon, LoaderIcon } from './Icons';
+import { SparklesIcon, ClipboardIcon, CheckIcon, LoaderIcon, LockIcon } from './Icons';
 import SkeletonLoader from './SkeletonLoader';
 import { useTranslations } from '../hooks/useTranslations';
 
@@ -7,9 +7,10 @@ interface PitchGeneratorProps {
   onGenerate: () => void;
   pitches: string[];
   isLoading: boolean;
+  mode?: 'full' | 'demo';
 }
 
-const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pitches, isLoading }) => {
+const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pitches, isLoading, mode = 'full' }) => {
   const [selectedPitchIndex, setSelectedPitchIndex] = useState(0);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const t = useTranslations();
@@ -29,6 +30,18 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
   };
 
   const hasPitches = pitches && pitches.length > 0;
+
+  if (mode === 'demo') {
+    return (
+      <div data-section-id="pitchGenerator" className="mt-8 bg-white dark:bg-brand-secondary p-6 rounded-lg no-print animate-slide-in border border-gray-200 dark:border-brand-accent" style={{ animationDelay: '200ms' }}>
+        <div className="flex flex-col items-center justify-center text-center p-6 bg-gray-50 dark:bg-brand-primary rounded-lg border-2 border-dashed border-gray-300 dark:border-brand-accent">
+          <LockIcon className="w-12 h-12 text-gray-400 dark:text-brand-accent mb-4"/>
+          <h4 className="text-lg font-bold text-gray-800 dark:text-brand-text">{t('demo_pitch_locked_title')}</h4>
+          <p className="text-sm text-gray-600 dark:text-brand-light max-w-sm">{t('demo_pitch_locked_text')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div data-section-id="pitchGenerator" className="mt-8 bg-white dark:bg-brand-secondary p-6 rounded-lg no-print animate-slide-in border border-gray-200 dark:border-brand-accent" style={{ animationDelay: '200ms' }}>

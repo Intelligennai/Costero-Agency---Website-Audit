@@ -3,9 +3,10 @@ import { useTranslations } from '../../hooks/useTranslations';
 
 interface HeroSectionProps {
   onRegister: () => void;
+  onDemo: () => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ onRegister }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ onRegister, onDemo }) => {
   const t = useTranslations();
   return (
     <section id="home" className="py-20 md:py-32">
@@ -17,7 +18,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRegister }) => {
           {t('landing_hero_subtitle')}
         </p>
         <button
-          onClick={onRegister}
+          onClick={onDemo}
           className="px-8 py-4 text-lg font-bold text-brand-primary bg-brand-cyan rounded-full hover:bg-opacity-90 transition-all shadow-lg hover:shadow-cyan-500/50"
         >
           {t('landing_hero_cta')}

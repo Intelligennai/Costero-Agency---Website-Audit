@@ -4,9 +4,10 @@ import { CheckIcon } from '../Icons';
 
 interface PricingSectionProps {
   onRegister: () => void;
+  onDemo: () => void;
 }
 
-const PricingSection: React.FC<PricingSectionProps> = ({ onRegister }) => {
+const PricingSection: React.FC<PricingSectionProps> = ({ onRegister, onDemo }) => {
   const t = useTranslations();
   const [isYearly, setIsYearly] = useState(false);
 
@@ -22,6 +23,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onRegister }) => {
       ],
       cta: t('landing_pricing_starter_cta'),
       isFeatured: false,
+      action: onDemo,
     },
     {
       title: t('landing_pricing_pro_title'),
@@ -35,6 +37,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onRegister }) => {
       ],
       cta: t('landing_pricing_pro_cta'),
       isFeatured: true,
+      action: onRegister,
     },
     {
       title: t('landing_pricing_enterprise_title'),
@@ -48,6 +51,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onRegister }) => {
       ],
       cta: t('landing_pricing_enterprise_cta'),
       isFeatured: false,
+      action: onRegister,
     },
   ];
 
@@ -85,7 +89,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onRegister }) => {
                 ))}
               </ul>
               <button
-                onClick={onRegister}
+                onClick={plan.action}
                 className={`w-full mt-8 py-3 text-sm font-bold rounded-full transition-all ${plan.isFeatured ? 'bg-brand-cyan text-brand-primary hover:bg-opacity-90' : 'bg-gray-200 dark:bg-brand-accent text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600'}`}
               >
                 {plan.cta}
