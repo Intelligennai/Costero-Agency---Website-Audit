@@ -40,26 +40,26 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
   const t = useTranslations();
 
   return (
-    <div data-section-id={sectionId} className={`bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid ${className}`}>
+    <div data-section-id={sectionId} className={`bg-gray-50 dark:bg-brand-primary p-6 rounded-lg flex flex-col h-full transform hover:-translate-y-1 transition-transform duration-300 print-break-inside-avoid border border-gray-200 dark:border-brand-accent ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <span className="text-brand-cyan" title={title}>{icon}</span>
-          <h4 className="text-xl font-bold text-gray-700 dark:text-brand-light">{title}</h4>
+          <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100">{title}</h4>
         </div>
         {score !== undefined && (
-          <div className={`text-3xl font-bold ${scoreColor}`}>{score}<span className="text-lg">/100</span></div>
+          <div className={`text-3xl font-bold ${scoreColor}`}>{score}<span className="text-lg text-gray-500 dark:text-brand-light">/100</span></div>
         )}
       </div>
-      <div className="text-gray-800 dark:text-brand-text flex-grow">
+      <div className="text-gray-700 dark:text-brand-light flex-grow prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-2">
         {comment.split('\n').map((line, index) => (
-          <p key={`${line}-${index}`} className={line.trim().startsWith('*') ? 'ml-4' : ''}>
-            {line}
+          <p key={`${line}-${index}`}>
+            {line.replace(/^\s*\*\s*/, '• ')}
           </p>
         ))}
       </div>
       
       {socialMediaStats && socialMediaStats.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent">
           <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">{t('report_social_media_followers')}</h5>
           <ul className="space-y-2">
             {socialMediaStats.map((stat, index) => (
@@ -76,13 +76,13 @@ const ReportSectionComponent: React.FC<ReportSectionProps> = ({ title, score, co
       )}
 
       {hasReputationData && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent/30">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-brand-accent">
             <h5 className="text-sm font-bold text-gray-600 dark:text-brand-light mb-2">{t('report_online_reputation')}</h5>
             <ul className="space-y-2">
                 {googleReviews && (
                     <li className="flex items-center justify-between text-gray-800 dark:text-brand-text">
                         <span className="flex items-center gap-2">
-                            <GoogleIcon className="w-5 h-5 text-gray-500 dark:text-brand-light" />
+                            <GoogleIcon className="w-5 h-5 text-gray-500" />
                             {t('report_google_reviews')}
                         </span>
                         <div className="text-right">

@@ -1,30 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Global 8 Website Audit AI</title>
+    <title>AuditPro | AI-Powered Website Audits</title>
     <link rel="preconnect" href="https://aistudiocdn.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
-      darkMode: 'class', // Enable class-based dark mode
+      darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
           colors: {
-            'brand-primary': '#0D1B2A',
-            'brand-secondary': '#1B263B',
-            'brand-accent': '#415A77',
-            'brand-light': '#778DA9',
-            'brand-text': '#E0E1DD',
             'brand-cyan': '#00F5D4',
-            'brand-yellow': '#FEE440',
-            'brand-red': '#EF476F',
-            'brand-green': '#06D6A0',
+            'brand-primary': '#070B14',
+            'brand-secondary': '#111827',
+            'brand-accent': '#374151',
+            'brand-light': '#9CA3AF',
+            'brand-text': '#F9FAFB',
+            'brand-green': '#10B981',
+            'brand-yellow': '#F59E0B',
+            'brand-red': '#EF4444',
           },
           animation: {
             'fade-in': 'fadeIn 0.5s ease-in-out',
             'slide-in': 'slideIn 0.5s ease-in-out forwards',
+            'background-shine': 'background-shine 2s linear infinite',
+            'border-beam': 'border-beam calc(var(--duration)*1s) linear infinite',
           },
           keyframes: {
             fadeIn: {
@@ -34,7 +42,16 @@
             slideIn: {
               '0%': { transform: 'translateY(20px)', opacity: 0 },
               '100%': { transform: 'translateY(0)', opacity: 1 },
-            }
+            },
+            'background-shine': {
+              'from': { backgroundPosition: '0 0' },
+              'to': { backgroundPosition: '-200% 0' },
+            },
+            'border-beam': {
+                '100%': {
+                    'offset-distance': '100%',
+                },
+            },
           }
         }
       }
@@ -75,7 +92,7 @@
 }
 </script>
 </head>
-  <body>
+  <body class="bg-white dark:bg-brand-primary transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>

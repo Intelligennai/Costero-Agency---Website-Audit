@@ -89,4 +89,4 @@ const AuditFormComponent: React.FC<AuditFormProps> = ({ onAudit, isLoading }) =>
   );
 };
 
-export const AuditForm = React.memo(AuditFormComponent);
+export default AuditFormComponent;

@@ -22,7 +22,7 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrintRequest }) =
   ], [data, t]);
 
   return (
-    <div className="bg-white dark:bg-brand-secondary rounded-lg shadow-2xl p-6 md:p-8 animate-slide-in">
+    <div className="bg-white dark:bg-brand-secondary rounded-xl shadow-lg p-6 md:p-8 animate-slide-in border border-gray-200 dark:border-brand-accent">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-4 border-b border-gray-200 dark:border-brand-accent">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-brand-text">{t('report_title')}</h2>
@@ -38,13 +38,13 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrintRequest }) =
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div data-section-id="summary" className="md:col-span-2 bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg">
-          <h3 className="text-2xl font-bold mb-4 text-gray-700 dark:text-brand-light">{t('summary_title')}</h3>
-          <p className="text-gray-800 dark:text-brand-text text-lg">{data.summary || 'An executive summary could not be generated.'}</p>
+        <div data-section-id="summary" className="md:col-span-2 bg-gray-50 dark:bg-brand-primary p-6 rounded-lg border border-gray-200 dark:border-brand-accent">
+          <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">{t('summary_title')}</h3>
+          <p className="text-gray-700 dark:text-brand-light text-lg">{data.summary || 'An executive summary could not be generated.'}</p>
         </div>
 
-        <div data-section-id="overallPotential" className="flex flex-col items-center justify-center bg-gray-100 dark:bg-brand-primary/50 p-6 rounded-lg print-break-inside-avoid">
-          <h3 className="text-2xl font-bold mb-4 text-gray-700 dark:text-brand-light flex items-center gap-2">
+        <div data-section-id="overallPotential" className="flex flex-col items-center justify-center bg-gray-50 dark:bg-brand-primary p-6 rounded-lg print-break-inside-avoid border border-gray-200 dark:border-brand-accent">
+          <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100 flex items-center gap-2">
             <span title={t('potential_title')}>
               <PotentialIcon className="w-7 h-7" />
             </span>
@@ -57,7 +57,7 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrintRequest }) =
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500 dark:text-brand-light">Not available</p>
+              <p className="text-gray-500">Not available</p>
             </div>
           )}
         </div>
@@ -72,7 +72,7 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrintRequest }) =
             />
         )}
         
-        {reportSections.slice(1).map((section, index) => {
+        {reportSections.slice(1).map((section) => {
            if (!section.data) return null;
             const digitalMarketingData = section.id === 'digitalMarketingPresence' 
             ? (section.data as DigitalMarketingSection) 
@@ -80,7 +80,7 @@ const ReportComponent: React.FC<ReportProps> = ({ data, url, onPrintRequest }) =
 
             return (
               <ReportSection
-                key={index + 1}
+                key={section.id}
                 sectionId={section.id}
                 title={section.title}
                 score={section.data.score}

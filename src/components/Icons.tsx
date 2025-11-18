@@ -294,3 +294,60 @@ const LogoutIconComponent: React.FC<IconProps> = (props) => (
     </svg>
 );
 export const LogoutIcon = React.memo(LogoutIconComponent);
+
+const PlusIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+    </svg>
+);
+export const PlusIcon = React.memo(PlusIconComponent);
+
+const EyeIconComponent: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+);
+export const EyeIcon = React.memo(EyeIconComponent);
+
+const FeatureAuditIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="12" y1="8" x2="18" y2="8"/><path d="m21 11-3-3 3-3"/><path d="m15 21-3-3 3-3"/>
+    </svg>
+);
+export const FeatureAuditIconComponent = React.memo(FeatureAuditIcon);
+
+const FeatureBrandingIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m12 3-8.89 3.33a1 1 0 0 0-.64 1.54l8.3 12.33a1 1 0 0 0 1.66 0l8.3-12.33a1 1 0 0 0-.64-1.54L12 3z"/><path d="M12 3v18"/>
+    </svg>
+);
+export const FeatureBrandingIconComponent = React.memo(FeatureBrandingIcon);
+
+const FeatureCompetitorIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20Z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Z"/><path d="M12 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/>
+    </svg>
+);
+export const FeatureCompetitorIconComponent = React.memo(FeatureCompetitorIcon);
+
+const FeaturePitchIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+);
+export const FeaturePitchIconComponent = React.memo(FeaturePitchIcon);
+
+const FeatureDataIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M2 20h20"/><path d="M16 7.5h-8"/>
+    </svg>
+);
+export const FeatureDataIconComponent = React.memo(FeatureDataIcon);
+
+const FeatureDashboardIcon: React.FC<IconProps> = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+    </svg>
+);
+export const FeatureDashboardIconComponent = React.memo(FeatureDashboardIcon);

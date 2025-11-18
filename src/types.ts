@@ -40,6 +40,14 @@ export interface ChatMessage {
   text: string;
 }
 
+// FIX: Added SavedAudit interface to be used for storing audit history.
+export interface SavedAudit {
+  id: string;
+  url: string;
+  reportData: AuditReportData;
+  createdAt: string;
+}
+
 export interface AgencyProfile {
   name: string;
   services: string[];
@@ -53,6 +61,8 @@ export interface User {
   email: string;
   agencyProfile?: AgencyProfile;
   branding: BrandingSettings;
+  // FIX: Added audits property to user to store their audit history.
+  audits?: SavedAudit[];
 }
 
 export interface PdfExportOptions {

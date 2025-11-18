@@ -1,6 +1,7 @@
 import React, { createContext, ReactNode } from 'react';
 import { useAuth as useAuthHook } from '../hooks/useAuth';
-import type { User, AgencyProfile } from '../types';
+// FIX: Import SavedAudit type
+import type { User, AgencyProfile, SavedAudit } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,9 @@ interface AuthContextType {
   register: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<Omit<User, 'email'>>) => Promise<void>;
+  // FIX: Added functions to manage audits
+  addAudit: (audit: SavedAudit) => void;
+  deleteAudit: (auditId: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

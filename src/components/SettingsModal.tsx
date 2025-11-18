@@ -59,7 +59,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
         aria-labelledby="settings-modal-heading"
     >
         <div 
-            className="w-full max-w-lg flex flex-col bg-white dark:bg-brand-secondary rounded-xl shadow-2xl animate-slide-in"
+            className="w-full max-w-lg flex flex-col bg-white dark:bg-brand-secondary rounded-xl shadow-2xl animate-slide-in border border-gray-200 dark:border-brand-accent"
             onClick={(e) => e.stopPropagation()}
         >
             <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-brand-accent">

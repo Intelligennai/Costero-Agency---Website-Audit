@@ -31,16 +31,16 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
   const hasPitches = pitches && pitches.length > 0;
 
   return (
-    <div data-section-id="pitchGenerator" className="mt-8 bg-gray-50 dark:bg-brand-secondary/50 p-6 rounded-lg no-print animate-slide-in" style={{ animationDelay: '200ms' }}>
+    <div data-section-id="pitchGenerator" className="mt-8 bg-white dark:bg-brand-secondary p-6 rounded-lg no-print animate-slide-in border border-gray-200 dark:border-brand-accent" style={{ animationDelay: '200ms' }}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-        <h3 className="text-2xl font-bold text-gray-700 dark:text-brand-light flex items-center gap-2">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-brand-text flex items-center gap-2">
             <SparklesIcon className="w-6 h-6 text-brand-yellow" />
             {t('pitch_generator_title')}
         </h3>
         <button
           onClick={onGenerate}
           disabled={isLoading}
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-brand-yellow text-brand-primary font-bold rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 dark:focus:ring-offset-brand-secondary focus:ring-brand-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-brand-yellow text-brand-primary font-bold rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-brand-secondary focus:ring-brand-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -53,7 +53,7 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
       
       {isLoading && !hasPitches && (
         <div className="animate-fade-in mt-4">
-          <div className="relative bg-white dark:bg-brand-primary p-4 rounded-md space-y-3">
+          <div className="relative bg-gray-50 dark:bg-brand-primary p-4 rounded-md space-y-3">
              <SkeletonLoader className="h-4 w-3/4" />
              <SkeletonLoader className="h-4 w-full" />
              <SkeletonLoader className="h-4 w-5/6" />
@@ -63,7 +63,7 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
 
       {hasPitches && !isLoading && (
         <div className="animate-fade-in">
-          <div className="flex space-x-2 p-1 bg-gray-200 dark:bg-brand-accent/20 rounded-lg mb-4">
+          <div className="flex space-x-2 p-1 bg-gray-200 dark:bg-brand-accent rounded-lg mb-4">
              {pitches.map((_, index) => (
               <div key={index} className="flex-1">
                 <input
@@ -80,7 +80,7 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
                   className={`w-full block text-center px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors ${
                     selectedPitchIndex === index
                       ? 'bg-brand-cyan text-brand-primary shadow'
-                      : 'text-gray-600 hover:bg-gray-300/70 dark:text-brand-light dark:hover:bg-brand-accent/50'
+                      : 'text-gray-600 hover:bg-gray-300/70 dark:text-brand-light dark:hover:bg-gray-700'
                   }`}
                 >
                   {t('pitch_variation')} {index + 1}
@@ -89,10 +89,10 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
             ))}
           </div>
           
-          <div className="relative bg-white dark:bg-brand-primary p-4 rounded-md">
+          <div className="relative bg-gray-50 dark:bg-brand-primary p-4 rounded-md border border-gray-200 dark:border-brand-accent">
              <button
                 onClick={() => handleCopy(selectedPitchIndex)}
-                className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1 text-sm rounded-md bg-gray-200 text-gray-700 dark:text-brand-text dark:bg-brand-accent hover:bg-gray-300 dark:hover:bg-brand-light transition-colors disabled:opacity-50"
+                className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1 text-sm rounded-md bg-gray-200 text-gray-700 dark:text-brand-text dark:bg-brand-accent hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
                 disabled={copiedIndex === selectedPitchIndex}
                 title={t('copy_tooltip')}
             >
@@ -108,7 +108,7 @@ const PitchGeneratorComponent: React.FC<PitchGeneratorProps> = ({ onGenerate, pi
                     </>
                 )}
             </button>
-            <p className="text-gray-800 dark:text-brand-text whitespace-pre-wrap min-h-[120px] pr-20">{pitches[selectedPitchIndex]}</p>
+            <p className="text-gray-800 dark:text-brand-light whitespace-pre-wrap min-h-[120px] pr-20">{pitches[selectedPitchIndex]}</p>
           </div>
         </div>
       )}

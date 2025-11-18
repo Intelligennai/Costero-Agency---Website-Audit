@@ -6,7 +6,11 @@ import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
 import SettingsModal from './SettingsModal';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onNavigateToDashboard: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onNavigateToDashboard }) => {
   const { user, logout } = useAuthContext();
   const t = useTranslations();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -16,15 +20,19 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-white/80 dark:bg-brand-primary/80 backdrop-blur-sm shadow-sm no-print">
+      <header className="sticky top-0 z-30 bg-white/80 dark:bg-brand-primary/80 backdrop-blur-sm border-b border-gray-200 dark:border-brand-accent no-print">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Agency Branding */}
-            <div className="flex items-center gap-3">
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={onNavigateToDashboard}
+              title="Back to Dashboard"
+            >
               {logo ? (
                 <img src={logo} alt={`${agencyName} Logo`} className="h-10 w-auto max-w-[150px] object-contain" />
               ) : (
-                <h1 className="text-xl font-bold text-gray-900 dark:text-brand-text">{agencyName}</h1>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">{agencyName}</h1>
               )}
             </div>
 

@@ -1,22 +1,29 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import { LoaderIcon } from './components/Icons';
 
-const Login = lazy(() => import('./components/Login').then(module => ({ default: module.Login })));
-const AgencySetup = lazy(() => import('./components/AgencySetup').then(module => ({ default: module.default })));
-const AuditTool = lazy(() => import('./components/AuditTool').then(module => ({ default: module.AuditTool })));
+const MainPlatform = lazy(() => import('./components/MainPlatform'));
+const Login = lazy(() => import('./components/Login'));
+const LandingPage = lazy(() => import('./components/landing/LandingPage'));
 
 const FullScreenLoader: React.FC<{ message?: string }> = ({ message }) => (
   <div className="min-h-screen bg-white dark:bg-brand-primary font-sans flex flex-col items-center justify-center text-center p-4">
-    <LoaderIcon className="w-16 h-16 animate-spin text-brand-cyan" />
-    {message && <p className="mt-4 text-xl font-semibold text-gray-700 dark:text-brand-text">{message}</p>}
+    <LoaderIcon className="w-12 h-12 animate-spin text-brand-cyan" />
+    {message && <p className="mt-4 text-lg font-medium text-gray-600 dark:text-brand-light">{message}</p>}
   </div>
 );
+
+type UnauthenticatedView = 'landing' | 'login' | 'register';
 
 const App: React.FC = () => {
   useTheme(); // Initialize and manage theme
   const { user, isLoading } = useAuth();
+  const [unauthenticatedView, setUnauthenticatedView] = useState<UnauthenticatedView>('landing');
+
+  const showLogin = () => setUnauthenticatedView('login');
+  const showRegister = () => setUnauthenticatedView('register');
+  const showLanding = () => setUnauthenticatedView('landing');
 
   if (isLoading) {
     return <FullScreenLoader message="Loading session..." />;
@@ -24,12 +31,14 @@ const App: React.FC = () => {
 
   return (
     <Suspense fallback={<FullScreenLoader />}>
-      {!user ? (
-        <Login />
-      ) : !user.agencyProfile ? (
-        <AgencySetup />
+      {user ? (
+        <MainPlatform />
       ) : (
-        <AuditTool />
+        <>
+          {unauthenticatedView === 'landing' && <LandingPage onLogin={showLogin} onRegister={showRegister} />}
+          {unauthenticatedView === 'login' && <Login onShowLanding={showLanding} onToggleMode={showRegister} mode="login" />}
+          {unauthenticatedView === 'register' && <Login onShowLanding={showLanding} onToggleMode={showLogin} mode="register" />}
+        </>
       )}
     </Suspense>
   );

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslations } from '../hooks/useTranslations';
-import { LockIcon, LoaderIcon, UserIcon } from './Icons';
+import { LockIcon, LoaderIcon, UserIcon, CloseIcon } from './Icons';
 import type { TranslationKey } from '../translations';
 
-export const Login: React.FC = () => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+interface LoginProps {
+    mode: 'login' | 'register';
+    onToggleMode: () => void;
+    onShowLanding: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ mode, onToggleMode, onShowLanding }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -46,13 +51,12 @@ export const Login: React.FC = () => {
     }
   };
 
-  const toggleMode = () => {
-    setMode(prevMode => prevMode === 'login' ? 'register' : 'login');
-  }
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white dark:bg-brand-primary">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-brand-secondary rounded-xl shadow-lg animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50 dark:bg-brand-primary p-4 animate-fade-in">
+       <button onClick={onShowLanding} className="absolute top-4 right-4 p-2 rounded-full text-gray-500 dark:text-brand-light hover:bg-gray-100 dark:hover:bg-brand-accent transition-colors" aria-label="Close">
+            <CloseIcon className="w-6 h-6" />
+        </button>
+      <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-brand-secondary rounded-xl shadow-lg border border-gray-200 dark:border-brand-accent">
         <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-brand-text mb-2">
                 {mode === 'login' ? t('login_welcome_back') : t('login_create_account')}
@@ -142,7 +146,7 @@ export const Login: React.FC = () => {
 
         <p className="text-center text-sm text-gray-500 dark:text-brand-light">
           {mode === 'login' ? t('login_no_account') : t('login_already_have_account')}
-          <button onClick={toggleMode} disabled={isLoading} className="font-semibold text-brand-cyan hover:underline ml-1 focus:outline-none disabled:opacity-50">
+          <button onClick={onToggleMode} disabled={isLoading} className="font-semibold text-brand-cyan hover:underline ml-1 focus:outline-none disabled:opacity-50">
             {mode === 'login' ? t('login_sign_up') : t('login_log_in')}
           </button>
         </p>

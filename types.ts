@@ -1,4 +1,3 @@
-
 export interface AuditSection {
   score: number;
   comment: string;
@@ -39,4 +38,34 @@ export interface AuditReportData {
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
+}
+
+export interface SavedAudit {
+  id: string;
+  url: string;
+  reportData: AuditReportData;
+  createdAt: string;
+}
+
+export interface AgencyProfile {
+  name: string;
+  services: string[];
+}
+
+export interface BrandingSettings {
+  logo: string | null; // Base64 string for the logo
+}
+
+export interface User {
+  email: string;
+  agencyProfile?: AgencyProfile;
+  branding: BrandingSettings;
+  audits: SavedAudit[];
+}
+
+export interface PdfExportOptions {
+  selectedSections: string[];
+  headerText: string;
+  footerText: string;
+  logo: string | null;
 }

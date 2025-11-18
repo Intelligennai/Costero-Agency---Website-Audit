@@ -1,16 +1,15 @@
 import React, { useState, useCallback, useEffect, lazy, Suspense, useRef, useContext } from 'react';
 import { generateAuditReport, generateSalesPitch, createChatSession } from '../services/geminiService';
-import type { AuditReportData, ChatMessage, PdfExportOptions } from '../types';
+import type { AuditReportData, ChatMessage, PdfExportOptions, SavedAudit } from '../types';
 import { GithubIcon, ServerCrashIcon } from './Icons';
 import type { Chat } from '@google/genai';
 import { useAuthContext } from '../hooks/useAuth';
 import { useTranslations } from '../hooks/useTranslations';
 import { LanguageContext } from '../context/LanguageContext';
 import type { TranslationKey } from '../translations';
+import AuditForm from './AuditForm';
 
 // Lazy load components
-const Header = lazy(() => import('./Header'));
-const AuditForm = lazy(() => import('./AuditForm').then(module => ({ default: module.AuditForm })));
 const Report = lazy(() => import('./Report').then(module => ({ default: module.Report })));
 const PitchGenerator = lazy(() => import('./PitchGenerator').then(module => ({ default: module.PitchGenerator })));
 const CallNotes = lazy(() => import('./CallNotes').then(module => ({ default: module.CallNotes })));
@@ -19,14 +18,20 @@ const Chatbot = lazy(() => import('./Chatbot').then(module => ({ default: module
 const ReportSkeleton = lazy(() => import('./ReportSkeleton'));
 const PdfExportModal = lazy(() => import('./PdfExportModal').then(module => ({ default: module.PdfExportModal })));
 
+interface AuditToolProps {
+  initialAudit?: SavedAudit;
+  onNewAudit: () => void;
+  onAuditSaved: (audit: SavedAudit) => void;
+}
 
-export const AuditTool: React.FC = () => {
+
+const AuditTool: React.FC<AuditToolProps> = ({ initialAudit, onNewAudit, onAuditSaved }) => {
   const { user } = useAuthContext();
   const t = useTranslations();
   const { language } = useContext(LanguageContext);
   
-  const [url, setUrl] = useState<string>('');
-  const [reportData, setReportData] = useState<AuditReportData | null>(null);
+  const [url, setUrl] = useState<string>(initialAudit?.url || '');
+  const [reportData, setReportData] = useState<AuditReportData | null>(initialAudit?.reportData || null);
   const [pitches, setPitches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPitchLoading, setIsPitchLoading] = useState<boolean>(false);
@@ -62,13 +67,20 @@ export const AuditTool: React.FC = () => {
     try {
       const data = await generateAuditReport(domain, agencyProfile, language);
       setReportData(data);
+      const newAudit: SavedAudit = {
+        id: Date.now().toString(),
+        url: domain,
+        reportData: data,
+        createdAt: new Date().toISOString(),
+      };
+      onAuditSaved(newAudit);
     } catch (e) {
       console.error(e);
       setError((e as Error).message || 'error_message_default');
     } finally {
       setIsLoading(false);
     }
-  }, [agencyProfile, language]);
+  }, [agencyProfile, language, onAuditSaved]);
   
   const handleGeneratePitch = useCallback(async () => {
     if (!reportData || !agencyProfile) return;
@@ -137,7 +149,7 @@ export const AuditTool: React.FC = () => {
                 const content = clonedDoc.getElementById('report-content')!;
                 // Ensure dark mode styles are applied for capture
                 if (document.documentElement.classList.contains('dark')) {
-                    content.style.backgroundColor = '#1B263B';
+                    content.style.backgroundColor = '#111827'; // brand-secondary
                 } else {
                     content.style.backgroundColor = '#ffffff';
                 }
@@ -212,7 +224,7 @@ export const AuditTool: React.FC = () => {
         setIsPdfGenerating(false);
         setIsPdfModalOpen(false);
     }
-}, [url, t]);
+}, [url]);
 
 
   if (!agencyProfile) {
@@ -220,20 +232,17 @@ export const AuditTool: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-brand-primary font-sans">
-      <Suspense fallback={<div className="h-20" />}>
-          <Header />
-      </Suspense>
+    <div className="min-h-screen bg-gray-50 dark:bg-brand-primary font-sans">
       <main className="container mx-auto p-4 md:p-8">
-        <header className="text-center mb-8 no-print">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-brand-text mb-2">{t('header_title', { agencyName: agencyProfile.name })}</h1>
-          <p className="text-lg text-gray-500 dark:text-brand-light">{t('header_subtitle')}</p>
-        </header>
+        {!reportData && (
+          <header className="text-center mb-8 no-print max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-brand-text mb-2">{t('header_title', { agencyName: agencyProfile.name })}</h1>
+            <p className="text-lg text-gray-600 dark:text-brand-light">{t('header_subtitle')}</p>
+          </header>
+        )}
 
         <div className="max-w-4xl mx-auto no-print">
-            <Suspense fallback={null}>
-                <AuditForm onAudit={handleAudit} isLoading={isLoading} />
-            </Suspense>
+            <AuditForm onAudit={handleAudit} isLoading={isLoading} />
         </div>
 
         {isLoading && (
@@ -243,10 +252,10 @@ export const AuditTool: React.FC = () => {
         )}
 
         {error && !isLoading && (
-          <div className="flex flex-col items-center justify-center text-center mt-12 bg-gray-100 dark:bg-brand-secondary p-8 rounded-lg animate-fade-in">
+          <div className="flex flex-col items-center justify-center text-center mt-12 bg-red-50 dark:bg-red-900/20 p-8 rounded-lg animate-fade-in border border-red-200 dark:border-red-500/30">
             <ServerCrashIcon className="w-16 h-16 text-brand-red mb-4" />
-            <p className="text-xl font-semibold text-red-500 dark:text-red-400">{t('error_title')}</p>
-            <p className="text-gray-600 dark:text-brand-light max-w-md">{t(error as TranslationKey)}</p>
+            <p className="text-xl font-semibold text-red-700 dark:text-red-400">{t('error_title')}</p>
+            <p className="text-red-600 dark:text-red-300 max-w-md">{t(error as TranslationKey)}</p>
           </div>
         )}
 
@@ -288,7 +297,7 @@ export const AuditTool: React.FC = () => {
           )}
         </Suspense>
       </main>
-      <footer className="text-center p-4 mt-8 text-gray-500 dark:text-brand-accent border-t border-gray-200 dark:border-brand-accent/20 no-print">
+      <footer className="text-center p-4 mt-8 text-gray-500 dark:text-brand-light border-t border-gray-200 dark:border-brand-accent no-print">
         <a href="https://github.com/google-gemini-v2" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-brand-cyan transition-colors">
           <GithubIcon className="w-5 h-5" />
           Powered by Gemini

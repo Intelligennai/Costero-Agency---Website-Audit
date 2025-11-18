@@ -12,14 +12,13 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Initialize state in the constructor to ensure `this.props` is available.
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
-  }
+  // FIX: Initialize state as a class property instead of in the constructor.
+  // This is a more modern and common pattern in React class components with TypeScript
+  // and resolves the type errors related to 'this.state' and 'this.props'.
+  state: State = {
+    hasError: false,
+    error: null,
+  };
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -36,7 +35,7 @@ class ErrorBoundary extends Component<Props, State> {
       
       return (
         <div className="min-h-screen bg-gray-50 dark:bg-brand-primary font-sans flex items-center justify-center p-4">
-            <div className="flex flex-col items-center justify-center text-center bg-white dark:bg-brand-secondary p-8 rounded-lg max-w-2xl mx-auto shadow-lg">
+            <div className="flex flex-col items-center justify-center text-center bg-white dark:bg-brand-secondary p-8 rounded-lg max-w-2xl mx-auto shadow-lg border border-gray-200 dark:border-brand-accent">
                 <ServerCrashIcon className="w-16 h-16 text-brand-red mb-4" />
                 <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">{t.error_boundary_title}</h1>
                 <p className="text-gray-600 dark:text-brand-light mb-4">

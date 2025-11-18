@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import type { User } from '../types';
+// FIX: Import SavedAudit type
+import type { User, SavedAudit } from '../types';
 
 const USER_STORAGE_KEY = 'audit-tool-user';
 
@@ -58,7 +59,9 @@ export const useAuth = () => {
       }
       const newUser: User = { 
         email, 
-        branding: { logo: null } 
+        branding: { logo: null },
+        // FIX: Initialize audits array for new user.
+        audits: [],
       };
       storedUsers[email] = { password: pass, data: newUser };
       localStorage.setItem('users', JSON.stringify(storedUsers));
@@ -101,13 +104,28 @@ export const useAuth = () => {
     }
   };
 
+  // FIX: Implement addAudit to save a new audit to the user's profile.
+  const addAudit = (audit: SavedAudit) => {
+    if (!user) return;
+    const otherAudits = user.audits?.filter(a => a.id !== audit.id) || [];
+    const updatedAudits = [...otherAudits, audit];
+    updateUser({ audits: updatedAudits });
+  };
+
+  // FIX: Implement deleteAudit to remove an audit from the user's profile.
+  const deleteAudit = (auditId: string) => {
+    if (!user || !user.audits) return;
+    const updatedAudits = user.audits.filter(a => a.id !== auditId);
+    updateUser({ audits: updatedAudits });
+  };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem(USER_STORAGE_KEY);
   };
 
-  return { user, isLoading, error, login, register, logout, updateUser };
+  // FIX: Return addAudit and deleteAudit from the hook.
+  return { user, isLoading, error, login, register, logout, updateUser, addAudit, deleteAudit };
 };
 
 // Custom hook to easily consume the context
